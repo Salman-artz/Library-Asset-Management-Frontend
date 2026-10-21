@@ -4,6 +4,29 @@ Frontend web untuk sistem manajemen perpustakaan dan aset institusi. Aplikasi in
 
 Project dibangun menggunakan React, Vite, Tailwind CSS, dan React Router.
 
+---
+
+## 📸 Screenshots & Antarmuka Sistem
+
+<p align="center">
+  <img src="public/screenshots/foto1_katalog_buku_pencarian.png" alt="Katalog Koleksi Buku & Pencarian" width="95%" />
+  <br/>
+  <em>Katalog Buku & Koleksi Perpustakaan dengan Filter Kategori & Ketersediaan</em>
+</p>
+
+<details open>
+<summary><strong>Lihat Galeri Fitur Utama Lainnya ▾</strong></summary>
+
+| Modul | Preview Antarmuka |
+|---|---|
+| **Sirkulasi Peminjaman & Denda**<br/>Tabel peminjaman aktif, batas jatuh tempo, status kembali, dan denda keterlambatan otomatis. | <img src="public/screenshots/foto2_sirkulasi_peminjaman_denda.png" alt="Sirkulasi Peminjaman" width="460" /> |
+| **Tracking Aset Fisik Organisasi**<br/>Inventarisasi perangkat lab & server dengan kode barcode, kondisi barang, dan lokasi ruangan. | <img src="public/screenshots/foto3_tracking_aset_fisik.png" alt="Tracking Aset Fisik" width="460" /> |
+| **Laporan Statistik & Dashboard Admin**<br/>Ringkasan buku terpopuler, anggota paling aktif, dan modul ekspor data laporan. | <img src="public/screenshots/foto4_dashboard_ringkasan_admin.png" alt="Laporan Admin" width="460" /> |
+
+</details>
+
+---
+
 ## Fitur
 
 - Login dan register pengguna
