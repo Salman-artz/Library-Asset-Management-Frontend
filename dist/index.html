@@ -2,13 +2,24 @@
 <html lang="id">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="icon" type="image/png" href="./favicon.png" />
+    <link rel="apple-touch-icon" href="./favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pustaka Sentral — Sistem Informasi Perpustakaan</title>
-    <script type="module" crossorigin src="/assets/index-C6ksmMlL.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-BbXrldac.css">
+    <script>
+      try {
+        const theme = localStorage.getItem('lib_theme');
+        if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      } catch (e) {}
+    </script>
+    <script type="module" crossorigin src="./assets/index-C9KutFsA.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-CdH98Lq0.css">
   </head>
-  <body class="bg-slate-50">
+  <body class="bg-slate-50 dark:bg-[#0B1715] text-slate-800 dark:text-slate-100">
     <div id="root"></div>
   </body>
 </html>
