@@ -95,7 +95,7 @@ export default function Profile() {
             <div className="flex-1 space-y-2 text-center sm:text-left">
               <div>
                 <h3 className="text-base font-bold text-slate-900 dark:text-white">{user?.name}</h3>
-                <span className="inline-block px-2 py-0.5 mt-1 rounded-full text-[10px] font-mono uppercase bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-bold border border-emerald-300 dark:border-emerald-800">
+                <span className="inline-block px-2 py-0.5 mt-1 rounded-md text-[10px] font-mono uppercase bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-bold border border-emerald-300 dark:border-emerald-800">
                   Peran Akses: {user?.role}
                 </span>
               </div>

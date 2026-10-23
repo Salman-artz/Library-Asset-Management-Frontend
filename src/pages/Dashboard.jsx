@@ -122,10 +122,6 @@ export default function Dashboard() {
       {/* Welcome Banner - Responsive Full Width */}
       <div className="relative overflow-hidden rounded-2xl bg-[#122D27] dark:bg-[#0E221E] text-white p-6 sm:p-8 lg:p-10 shadow-lg border border-[#1E453C] w-full">
         <div className="relative z-10 max-w-3xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/30 text-emerald-300 border border-emerald-400/50 text-xs font-mono font-bold uppercase mb-3">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            {isMember ? 'Portal Layanan Mandiri Peminjam' : 'Pusat Sirkulasi & Manajemen Pustaka'}
-          </div>
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-white">
             Selamat datang, {user?.name || 'Pengguna'}!
           </h1>
@@ -325,9 +321,9 @@ export default function Dashboard() {
                 </div>
 
                 {/* Animated Visual Fill Bar */}
-                <div className="w-full bg-slate-200 dark:bg-slate-800 h-2.5 rounded-full overflow-hidden">
+                <div className="w-full bg-slate-200 dark:bg-slate-800 h-2.5 rounded-lg overflow-hidden">
                   <div
-                    className="h-full rounded-full bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-400 transition-all duration-700 group-hover:brightness-110"
+                    className="h-full rounded-lg bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-400 transition-all duration-700 group-hover:brightness-110"
                     style={{ width: `${percentage}%` }}
                   />
                 </div>
@@ -386,7 +382,7 @@ export default function Dashboard() {
                       </td>
                       <td className="py-3.5 px-4">
                         <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-[11px] font-bold ${
                             b.status === 'borrowed'
                               ? 'bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 border border-blue-200'
                               : b.status === 'returned'

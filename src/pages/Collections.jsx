@@ -440,7 +440,7 @@ export default function Collections() {
                   {/* Top Badges */}
                   <div className="absolute top-2.5 left-2.5 flex flex-wrap gap-1.5">
                     <span
-                      className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase ${
+                      className={`px-2.5 py-0.5 rounded-md text-[10px] font-bold tracking-wide uppercase ${
                         col.status === 'available'
                           ? 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300'
                           : col.status === 'borrowed'
@@ -486,9 +486,9 @@ export default function Collections() {
                         {col.available_stock} / {col.total_stock} Unit
                       </span>
                     </div>
-                    <div className="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                    <div className="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-md overflow-hidden">
                       <div
-                        className="bg-emerald-600 h-full rounded-full transition-all duration-500"
+                        className="bg-emerald-600 h-full rounded-md transition-all duration-500"
                         style={{
                           width: `${Math.min(100, Math.max(0, (col.available_stock / (col.total_stock || 1)) * 100))}%`,
                         }}
