@@ -13,17 +13,18 @@ Modern, responsive web frontend untuk sistem informasi sirkulasi perpustakaan in
 </p>
 
 <details open>
-<summary><strong>Lihat Dokumentasi Fitur Utama ▾</strong></summary>
+<summary><strong>Lihat Dokumentasi Fitur & Multi-Role Antarmuka ▾</strong></summary>
 
 | Fitur / Modul | Preview Antarmuka |
 |---|---|
+| **Login Mode Terang (Light Mode)**<br/>Antarmuka login resmi dengan lambang institusional Pustaka Sentral (Navy & Gold). | <img src="public/screenshots/38_login_light_mode.png" alt="Login Mode Terang" width="460" /> |
+| **Login Mode Gelap (Dark Mode)**<br/>Antarmuka login gelap dengan lambang adaptif kontras tinggi (White & Gold). | <img src="public/screenshots/39_login_dark_mode.png" alt="Login Mode Gelap" width="460" /> |
+| **Role Administrator (Admin)**<br/>Kendali penuh sistem perpustakaan, grafik analitik terpopuler, manajemen koleksi, denda, dan audit laporan. | <img src="public/screenshots/40_admin_dashboard_view.png" alt="Role Admin" width="460" /> |
+| **Role Staff Sirkulasi (Staff)**<br/>Operasional meja sirkulasi harian: peminjaman kilat (Fast Check-out), verifikasi pengembalian, dan hitung denda. | <img src="public/screenshots/41_staff_sirkulasi_view.png" alt="Role Staff Sirkulasi" width="460" /> |
+| **Role Anggota (Member Dashboard)**<br/>Portal mandiri anggota untuk melacak buku yang sedang dipinjam, riwayat sirkulasi, dan status tanggungan denda. | <img src="public/screenshots/42_member_portal_view.png" alt="Role Member Dashboard" width="460" /> |
+| **Role Anggota (Katalog & Peminjaman)**<br/>Pencarian katalog koleksi literatur kampus dengan fitur peminjaman mandiri 1-klik bagi mahasiswa. | <img src="public/screenshots/43_member_collections_catalog.png" alt="Katalog Member" width="460" /> |
 | **Chart Statistik Buku Terpopuler**<br/>Grafik batang analitik persentase frekuensi peminjaman koleksi buku paling diminati secara real-time. | <img src="public/screenshots/23_pustaka_sentral_dashboard_chart.png" alt="Chart Analitik Buku" width="460" /> |
-| **Login Bersih & Otentik**<br/>Formulir autentikasi profesional tanpa elemen demo dummy, terstandardisasi siap produksi. | <img src="public/screenshots/22_pustaka_sentral_login_clean.png" alt="Login Bersih" width="460" /> |
-| **Katalog & Filter Barcode ISBN**<br/>Pencarian instan kode ISBN/barcode, filter kategori literatur, dan indikator meter stok fisik. | <img src="public/screenshots/04_collections_catalog.png" alt="Katalog Koleksi" width="460" /> |
-| **Sirkulasi & Fast Check-out**<br/>Peminjaman kilat terintegrasi dengan opsi durasi adaptif peminjam (7/14/30 hari). | <img src="public/screenshots/08_fast_checkout_modal.png" alt="Fast Checkout" width="460" /> |
-| **1-Click Return & Kalkulator Denda**<br/>Perhitungan otomatis keterlambatan harian (Rp 3.000/hari) saat barang dikembalikan di meja sirkulasi. | <img src="public/screenshots/09_return_fine_calculator_modal.png" alt="Fine Calculator" width="460" /> |
 | **Format Sertifikat Bebas Pustaka Cetak**<br/>Layout kop surat resmi dengan validasi digital QR code & tanda tangan digital pustakawan untuk syarat yudisium. | <img src="public/screenshots/12_surat_bebas_pustaka_official.png" alt="Surat Bebas Pustaka" width="460" /> |
-| **Manajemen Kas & Denda Keterlambatan**<br/>Monitoring kas masuk, audit denda per member, dan verifikasi status lunas. | <img src="public/screenshots/13_fines_kas_management.png" alt="Kas Denda" width="460" /> |
 
 </details>
 
