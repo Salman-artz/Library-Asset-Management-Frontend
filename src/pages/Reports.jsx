@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
-import api from '../services/api'
+import { reportService } from '../services'
 import logoIcon from '../assets/logo-icon.png'
 import {
   FileBarChart2,
@@ -41,7 +41,7 @@ export default function Reports() {
   const fetchPopularCollections = async () => {
     setLoading(true)
     try {
-      const res = await api.get('/reports/popular-collections', { params: { limit: 10 } })
+      const res = await reportService.getPopularCollections(10)
       setPopularCollections(res.data.data?.data || res.data.data || [])
     } catch (err) {
       toast.error('Gagal memuat koleksi populer')
@@ -53,7 +53,7 @@ export default function Reports() {
   const fetchActiveMembers = async () => {
     setLoading(true)
     try {
-      const res = await api.get('/reports/active-members', { params: { limit: 10 } })
+      const res = await reportService.getActiveMembers(10)
       const list = res.data.data?.data || res.data.data || []
       setActiveMembers(list)
       if (list.length > 0) {
@@ -78,7 +78,7 @@ export default function Reports() {
       const params = {}
       if (dateRange.start) params.start_date = dateRange.start
       if (dateRange.end) params.end_date = dateRange.end
-      const res = await api.get('/reports/export', { params })
+      const res = await reportService.exportCirculation(params)
       const d = res.data.data || res.data
       setExportData(d.records || d || [])
       toast.success('Data audit laporan berhasil dimuat')
@@ -96,7 +96,7 @@ export default function Reports() {
       if (dateRange.start) params.start_date = dateRange.start
       if (dateRange.end) params.end_date = dateRange.end
 
-      const res = await api.get('/reports/export', { params, responseType: 'blob' })
+      const res = await reportService.downloadExportBlob(params)
       const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }))
       const link = document.createElement('a')
       link.href = url

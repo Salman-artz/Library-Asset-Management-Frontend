@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
-import api from '../services/api'
+import { collectionService, categoryService, borrowingService } from '../services'
 import { useAuth } from '../context/AuthContext'
 import {
   BookOpen,
@@ -77,7 +77,7 @@ export default function Collections() {
       if (status) params.status = status
       if (condition) params.condition = condition
 
-      const res = await api.get('/collections', { params })
+      const res = await collectionService.getCollections(params)
       const d = res.data.data
       const collectionsData = Array.isArray(d) ? d : (d.data || [])
       setCollections(collectionsData)
@@ -95,7 +95,7 @@ export default function Collections() {
 
   const fetchCategories = async () => {
     try {
-      const res = await api.get('/categories')
+      const res = await categoryService.getCategories()
       setCategories(res.data.data?.data || res.data.data || [])
     } catch (err) {
       // silent
@@ -175,10 +175,10 @@ export default function Collections() {
 
       if (editing) {
         formData.append('_method', 'PATCH')
-        await api.post(`/collections/${editing.id}`, formData)
+        await collectionService.updateCollection(editing.id, formData)
         toast.success('Koleksi berhasil diperbarui!')
       } else {
-        await api.post('/collections', formData)
+        await collectionService.createCollection(formData)
         toast.success('Koleksi baru berhasil ditambahkan!')
       }
       setShowModal(false)
@@ -199,7 +199,7 @@ export default function Collections() {
   const handleDelete = async (id) => {
     if (!confirm('Hapus koleksi ini dari katalog inventaris?')) return
     try {
-      await api.delete(`/collections/${id}`)
+      await collectionService.deleteCollection(id)
       toast.success('Koleksi berhasil dihapus')
       fetchCollections(pagination.currentPage)
     } catch (err) {
@@ -215,10 +215,7 @@ export default function Collections() {
     if (!window.confirm(`Ajukan peminjaman buku/koleksi "${title}"?`)) return
 
     try {
-      await api.post('/borrowings', {
-        collection_id: collectionId,
-        user_id: user.id,
-      })
+      await borrowingService.borrow(collectionId, user.id)
       toast.success('Peminjaman berhasil dicatat! Cek menu Peminjaman Saya.')
       fetchCollections(pagination.currentPage)
     } catch (err) {

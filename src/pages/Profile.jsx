@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import api from '../services/api'
+import { authService } from '../services'
 import { useAuth } from '../context/AuthContext'
 import { User, Mail, Shield, Camera, Save, ArrowLeft } from 'lucide-react'
 
@@ -44,7 +44,7 @@ export default function Profile() {
         formData.append('avatar', form.avatar)
       }
 
-      const res = await api.post('/auth/profile', formData)
+      const res = await authService.updateProfile(formData)
       
       const updatedUser = res.data.data?.user || res.data.user || res.data.data
       if (updatedUser) {

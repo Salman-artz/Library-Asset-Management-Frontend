@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
-import api from '../services/api'
+import { fineService } from '../services'
 import { useAuth } from '../context/AuthContext'
 import {
   Receipt,
@@ -28,8 +28,7 @@ export default function Fines() {
     try {
       const params = { page, per_page: 10 }
       if (filterStatus) params.status = filterStatus
-      const endpoint = isMember ? '/fines/mine' : '/fines'
-      const res = await api.get(endpoint, { params })
+      const res = isMember ? await fineService.getMyFines(params) : await fineService.getFines(params)
       const d = res.data.data
       const finesData = Array.isArray(d) ? d : (d.data || [])
       setFines(finesData)
@@ -52,7 +51,7 @@ export default function Fines() {
   const handlePay = async (id) => {
     if (!confirm('Validasi dan catat penerimaan kas denda ini sebagai LUNAS?')) return
     try {
-      await api.patch(`/fines/${id}/pay`)
+      await fineService.payFine(id)
       toast.success('Penerimaan kas denda berhasil diverifikasi!')
       fetchFines(pagination.currentPage)
     } catch (err) {

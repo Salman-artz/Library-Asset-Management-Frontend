@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
-import api from '../services/api'
+import { borrowingService, collectionService, reportService } from '../services'
 import { useAuth } from '../context/AuthContext'
 import {
   ArrowLeftRight,
@@ -63,7 +63,7 @@ export default function Borrowings() {
       const params = { page, per_page: 10 }
       if (filter) params.status = filter
       // If member, backend scopes to their user_id automatically
-      const res = await api.get('/borrowings', { params })
+      const res = await borrowingService.getBorrowings(params)
       const d = res.data.data
       const borrowingsData = Array.isArray(d) ? d : (d.data || [])
       setBorrowings(borrowingsData)
@@ -82,8 +82,8 @@ export default function Borrowings() {
   const loadCheckoutPrerequisites = async () => {
     try {
       const [colRes, memRes] = await Promise.allSettled([
-        api.get('/collections', { params: { per_page: 50, status: 'available' } }),
-        api.get('/reports/active-members'),
+        collectionService.getCollections({ per_page: 50, status: 'available' }),
+        reportService.getActiveMembers(),
       ])
 
       if (colRes.status === 'fulfilled') {
@@ -135,10 +135,7 @@ export default function Borrowings() {
 
     setSubmittingCheckout(true)
     try {
-      await api.post('/borrowings', {
-        collection_id: checkoutForm.collection_id,
-        user_id: checkoutForm.user_id || user.id,
-      })
+      await borrowingService.borrow(checkoutForm.collection_id, checkoutForm.user_id || user.id)
       toast.success('Peminjaman kilat berhasil diproses!')
       setShowFastCheckout(false)
       fetchBorrowings(1)
@@ -171,7 +168,7 @@ export default function Borrowings() {
     setReturnModal(prev => ({ ...prev, submitting: true }))
 
     try {
-      const res = await api.patch(`/borrowings/${returnModal.borrowing.id}/return`)
+      const res = await borrowingService.returnItem(returnModal.borrowing.id)
       const fineMsg = returnModal.calculatedFine > 0
         ? ` Pengembalian berhasil! Terlambat ${returnModal.daysLate} hari, denda Rp ${returnModal.calculatedFine.toLocaleString('id-ID')} dicatat.`
         : ' Pengembalian koleksi tepat waktu berhasil!'

@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react'
-import api from '../services/api'
+import { authService } from '../services'
 
 const AuthContext = createContext(null)
 
@@ -14,7 +14,7 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     if (token) {
       // Validasi token dengan fetch profile
-      api.get('/auth/me')
+      authService.getMe()
         .then((res) => {
           const userData = res.data.data.user
           setUser(userData)
@@ -30,7 +30,7 @@ export function AuthProvider({ children }) {
   }, [])
 
   const login = async (email, password) => {
-    const res = await api.post('/auth/login', { email, password })
+    const res = await authService.login(email, password)
     const { access_token: newToken, user: userData } = res.data.data
     setToken(newToken)
     setUser(userData)
@@ -40,7 +40,7 @@ export function AuthProvider({ children }) {
   }
 
   const register = async (name, email, password, passwordConfirmation) => {
-    const res = await api.post('/auth/register', {
+    const res = await authService.register({
       name,
       email,
       password,
@@ -56,7 +56,7 @@ export function AuthProvider({ children }) {
 
   const logout = () => {
     if (token) {
-      api.post('/auth/logout').catch(() => {})
+      authService.logout().catch(() => {})
     }
     setToken(null)
     setUser(null)

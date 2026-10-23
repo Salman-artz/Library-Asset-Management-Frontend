@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
-import api from '../services/api'
+import { categoryService } from '../services'
 import { useAuth } from '../context/AuthContext'
 import {
   Tags,
@@ -27,7 +27,7 @@ export default function Categories() {
     try {
       const params = { per_page: 50 }
       if (search) params.search = search
-      const res = await api.get('/categories', { params })
+      const res = await categoryService.getCategories(params)
       const d = res.data.data
       setCategories(d.data || d || [])
     } catch (err) {
@@ -63,10 +63,10 @@ export default function Categories() {
     setSubmitting(true)
     try {
       if (editing) {
-        await api.patch(`/categories/${editing.id}`, { name })
+        await categoryService.updateCategory(editing.id, { name })
         toast.success('Kategori berhasil diperbarui')
       } else {
-        await api.post('/categories', { name })
+        await categoryService.createCategory({ name })
         toast.success('Kategori berhasil ditambahkan')
       }
       setShowModal(false)
@@ -86,7 +86,7 @@ export default function Categories() {
   const handleDelete = async (id) => {
     if (!confirm('Hapus kategori ini? Pastikan tidak ada koleksi yang bergantung.')) return
     try {
-      await api.delete(`/categories/${id}`)
+      await categoryService.deleteCategory(id)
       toast.success('Kategori berhasil dihapus')
       fetchCategories()
     } catch (err) {

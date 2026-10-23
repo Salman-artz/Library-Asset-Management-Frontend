@@ -1,7 +1,12 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import api from '../services/api'
+import {
+  collectionService,
+  borrowingService,
+  fineService,
+  reportService
+} from '../services'
 import {
   BookOpen,
   ArrowLeftRight,
@@ -42,10 +47,10 @@ export default function Dashboard() {
     const fetchDashboardData = async () => {
       try {
         const [colRes, borrowRes, fineRes, popRes] = await Promise.allSettled([
-          api.get('/collections', { params: { per_page: 1 } }),
-          api.get('/borrowings', { params: { per_page: 6 } }),
-          api.get(isMember ? '/fines/mine' : '/fines'),
-          api.get('/reports/popular-collections', { params: { limit: 6 } }),
+          collectionService.getCollections({ per_page: 1 }),
+          borrowingService.getBorrowings({ per_page: 6 }),
+          isMember ? fineService.getMyFines() : fineService.getFines(),
+          reportService.getPopularCollections(6),
         ])
 
         const totalCol = colRes.status === 'fulfilled' ? (colRes.value.data.data?.total || 17) : 17
