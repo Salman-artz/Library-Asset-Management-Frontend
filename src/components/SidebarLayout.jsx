@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
+import logoIconWhite from '../assets/logo-icon-white.png'
 import {
   LayoutDashboard,
   BookOpen,
@@ -104,7 +105,7 @@ export default function SidebarLayout({ children }) {
             <Link to="/dashboard" className="flex items-center space-x-3 overflow-hidden">
               {/* High-Contrast White & Gold Emblem for Dark Sidebar */}
               <img
-                src="/logo-icon-white.png"
+                src={logoIconWhite}
                 alt="Pustaka Sentral"
                 className="w-10 h-10 object-contain shrink-0 filter drop-shadow"
               />
