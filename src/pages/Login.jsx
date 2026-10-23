@@ -43,7 +43,7 @@ export default function Login() {
       <div className="p-6 flex items-center justify-between max-w-7xl mx-auto w-full">
         <div className="flex items-center space-x-3">
           <img
-            src="/logo-icon.png"
+            src={isDark ? "/logo-icon-white.png" : "/logo-icon.png"}
             alt="Pustaka Sentral"
             className="w-11 h-11 object-contain shrink-0 filter drop-shadow-sm"
           />
@@ -71,7 +71,7 @@ export default function Login() {
         <div className="bg-white dark:bg-[#122420] rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 p-8 transition">
           <div className="text-center mb-7">
             <img
-              src="/logo-icon.png"
+              src={isDark ? "/logo-icon-white.png" : "/logo-icon.png"}
               alt="Pustaka Sentral Emblem"
               className="w-20 h-20 mx-auto object-contain filter drop-shadow-md mb-3"
             />
