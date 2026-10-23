@@ -42,9 +42,11 @@ export default function Login() {
       {/* Top bar */}
       <div className="p-6 flex items-center justify-between max-w-7xl mx-auto w-full">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-md">
-            <Library className="w-5 h-5" />
-          </div>
+          <img
+            src="/logo.png"
+            alt="Pustaka Sentral"
+            className="w-11 h-11 rounded-xl object-contain bg-white p-0.5 shadow-md border border-slate-200 dark:border-slate-700 shrink-0"
+          />
           <div>
             <span className="font-extrabold text-base tracking-wide uppercase text-slate-900 dark:text-white font-sans">
               PUSTAKA SENTRAL
@@ -68,9 +70,11 @@ export default function Login() {
       <div className="w-full max-w-md mx-auto px-4 my-auto">
         <div className="bg-white dark:bg-[#122420] rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 p-8 transition">
           <div className="text-center mb-7">
-            <div className="inline-flex p-3 rounded-2xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 mb-3 font-bold">
-              <BookOpen className="w-7 h-7" />
-            </div>
+            <img
+              src="/logo.png"
+              alt="Pustaka Sentral Emblem"
+              className="w-20 h-20 mx-auto rounded-2xl object-contain bg-white p-1.5 shadow-md border border-slate-200 dark:border-slate-700 mb-4"
+            />
             <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
               Masuk ke Perpustakaan
             </h1>

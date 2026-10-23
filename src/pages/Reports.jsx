@@ -601,18 +601,21 @@ export default function Reports() {
             {/* Printable Certificate Content */}
             <div id="printable-certificate" className="space-y-6 pt-4">
               {/* Kop Surat Resmi */}
-              <div className="text-center border-b-2 border-slate-900 pb-4">
-                <div className="text-xs uppercase tracking-widest font-bold text-emerald-800">
-                  KEMENTERIAN PENDIDIKAN, KEBUDAYAAN, RISET, DAN TEKNOLOGI
-                </div>
-                <div className="text-lg font-extrabold tracking-wide uppercase mt-1">
-                  UPT PERPUSTAKAAN & PUSAT SUMBER BELAJAR
-                </div>
-                <div className="text-xs text-slate-500">
-                  Sistem Sirkulasi & Manajemen Aset Terpadu • Kampus Terakreditasi Unggul
-                </div>
-                <div className="text-[11px] text-slate-400 mt-0.5">
-                  Jl. Telekomunikasi Terpadu No. 1 • Telp: (021) 789-0123 • Email: perpustakaan@library.test
+              <div className="border-b-2 border-slate-900 pb-4 flex items-center justify-between gap-4 text-center sm:text-left">
+                <img src="/logo.png" alt="Logo Pustaka Sentral" className="w-16 h-16 object-contain hidden sm:block shrink-0" />
+                <div className="flex-1 text-center">
+                  <div className="text-xs uppercase tracking-widest font-bold text-emerald-800">
+                    KEMENTERIAN PENDIDIKAN, KEBUDAYAAN, RISET, DAN TEKNOLOGI
+                  </div>
+                  <div className="text-lg font-extrabold tracking-wide uppercase mt-1">
+                    UPT PERPUSTAKAAN & PUSTAKA SENTRAL
+                  </div>
+                  <div className="text-xs text-slate-500">
+                    Sistem Sirkulasi & Manajemen Pustaka Terpadu • Kampus Terakreditasi Unggul
+                  </div>
+                  <div className="text-[11px] text-slate-400 mt-0.5">
+                    Jl. Telekomunikasi Terpadu No. 1 • Telp: (021) 789-0123 • Email: perpustakaan@library.test
+                  </div>
                 </div>
               </div>
 
