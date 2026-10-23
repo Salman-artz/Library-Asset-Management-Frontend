@@ -103,7 +103,7 @@ export default function Categories() {
             <Tags className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
             Manajemen Kategori Koleksi & Aset
           </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+          <p className="text-xs text-slate-600 dark:text-slate-300 mt-1">
             Total {categories.length} kategori pengelompokan buku dan aset fisik perpustakaan
           </p>
         </div>
@@ -127,7 +127,7 @@ export default function Categories() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Cari nama kategori..."
-          className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-sand-300 dark:border-sage-700 bg-white dark:bg-sage-900 text-slate-900 dark:text-white text-xs outline-none focus:ring-2 focus:ring-emerald-500 transition shadow-sm"
+          className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#122420] text-slate-900 dark:text-white text-xs outline-none focus:ring-2 focus:ring-emerald-500 transition shadow-sm"
         />
       </div>
 
@@ -138,7 +138,7 @@ export default function Categories() {
           <p className="text-xs">Memuat daftar kategori...</p>
         </div>
       ) : categories.length === 0 ? (
-        <div className="py-16 text-center text-slate-400 bg-white dark:bg-sage-900 rounded-2xl border border-sand-200 dark:border-sage-800 p-6">
+        <div className="py-16 text-center text-slate-400 bg-white dark:bg-[#122420] rounded-2xl border border-slate-200 dark:border-slate-800 p-6">
           <FolderOpen className="w-12 h-12 mx-auto text-slate-300 dark:text-slate-600 mb-3" />
           <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">Tidak ada kategori ditemukan</p>
         </div>
@@ -147,7 +147,7 @@ export default function Categories() {
           {categories.map((c) => (
             <div
               key={c.id}
-              className="p-5 rounded-2xl bg-white dark:bg-sage-900 border border-sand-200 dark:border-sage-800 shadow-sm hover:shadow-md hover:border-emerald-300 dark:hover:border-emerald-700 transition flex items-center justify-between"
+              className="p-5 rounded-2xl bg-white dark:bg-[#122420] border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-emerald-300 dark:hover:border-emerald-700 transition flex items-center justify-between"
             >
               <div className="flex items-center gap-3">
                 <div className="p-3 rounded-xl bg-sand-100 dark:bg-sage-800 text-emerald-600 dark:text-emerald-400 font-bold">
@@ -189,7 +189,7 @@ export default function Categories() {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
-          <div className="bg-white dark:bg-sage-900 rounded-2xl shadow-2xl border border-sand-200 dark:border-sage-800 w-full max-w-sm p-6">
+          <div className="bg-white dark:bg-[#122420] rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-sm p-6">
             <h2 className="text-base font-bold text-slate-900 dark:text-white mb-4">
               {editing ? 'Edit Kategori' : 'Tambah Kategori Baru'}
             </h2>
@@ -205,15 +205,15 @@ export default function Categories() {
                   onChange={(e) => setName(e.target.value)}
                   required
                   placeholder="Contoh: Robotika & AI"
-                  className="w-full px-3 py-2.5 rounded-xl border border-sand-300 dark:border-sage-700 bg-sand-50/50 dark:bg-sage-950 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-sand-50/50 dark:bg-sage-950 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
                 />
               </div>
 
-              <div className="pt-3 border-t border-sand-200 dark:border-sage-800 flex justify-end gap-2">
+              <div className="pt-3 border-t border-slate-200 dark:border-slate-800 flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 rounded-xl border border-sand-300 dark:border-sage-700 text-slate-600 dark:text-slate-300 hover:bg-sand-100"
+                  className="px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-sand-100"
                 >
                   Batal
                 </button>

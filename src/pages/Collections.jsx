@@ -34,11 +34,13 @@ const CONDITION_OPTIONS = [
   { value: '', label: 'Semua Kondisi' },
   { value: 'good', label: 'Kondisi Baik' },
   { value: 'fair', label: 'Kondisi Cukup' },
-  { value: 'damaged', label: 'Rusak / Perlu Servis' },
+  { value: 'damaged', label: 'Rusak / Servis' },
 ]
 
 export default function Collections() {
   const { user, isAuthenticated, hasRole } = useAuth()
+  const isMember = user?.role === 'member'
+
   const [collections, setCollections] = useState([])
   const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(true)
@@ -210,14 +212,14 @@ export default function Collections() {
       toast.error('Silakan login terlebih dahulu')
       return
     }
-    if (!window.confirm(`Proses peminjaman koleksi "${title}"?`)) return
+    if (!window.confirm(`Ajukan peminjaman buku/koleksi "${title}"?`)) return
 
     try {
       await api.post('/borrowings', {
         collection_id: collectionId,
         user_id: user.id,
       })
-      toast.success('Peminjaman berhasil dicatat!')
+      toast.success('Peminjaman berhasil dicatat! Cek menu Peminjaman Saya.')
       fetchCollections(pagination.currentPage)
     } catch (err) {
       toast.error(err.response?.data?.message || 'Gagal meminjam')
@@ -230,7 +232,6 @@ export default function Collections() {
     return `${API_BASE.replace('/api', '')}/storage/${path}`
   }
 
-  // Filter client side type (books vs physical assets)
   const filteredCollections = collections.filter(item => {
     if (typeFilter === 'books') {
       return item.code.includes('ISBN') || (item.category?.name !== 'Aset Kantor' && !item.code.startsWith('AST-'))
@@ -246,19 +247,19 @@ export default function Collections() {
       {/* Header bar */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2.5">
+          <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white flex items-center gap-2.5">
             <BookOpen className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
             Katalog Koleksi & Inventaris Aset
           </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            Total {pagination.total} item terdaftar dalam basis data sirkulasi terpusat
+          <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
+            Total {pagination.total} koleksi terdaftar dalam basis data perpustakaan
           </p>
         </div>
 
         {hasRole('admin', 'staff') && (
           <button
             onClick={openCreateModal}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-md transition transform hover:-translate-y-0.5"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md transition transform hover:-translate-y-0.5"
           >
             <Plus className="w-4 h-4" />
             Tambah Koleksi / Aset Baru
@@ -266,27 +267,27 @@ export default function Collections() {
         )}
       </div>
 
-      {/* Quick ISBN & Type Filter Bar */}
-      <div className="bg-white dark:bg-sage-900 rounded-2xl border border-sand-200 dark:border-sage-800 p-5 shadow-sm space-y-4">
+      {/* Quick ISBN & Type Filter Bar - High Contrast */}
+      <div className="bg-white dark:bg-[#122420] rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm space-y-4">
         {/* Type pills + quick sample searches */}
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-sand-200 dark:border-sage-800 pb-4">
-          <div className="flex items-center p-1 rounded-xl bg-sand-100 dark:bg-sage-950 border border-sand-200 dark:border-sage-800">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-700 pb-4">
+          <div className="flex items-center p-1 rounded-xl bg-slate-100 dark:bg-[#0c1815] border border-slate-200 dark:border-slate-700">
             <button
               onClick={() => setTypeFilter('all')}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition ${
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition ${
                 typeFilter === 'all'
-                  ? 'bg-white dark:bg-sage-800 text-slate-900 dark:text-white shadow-sm'
-                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-900'
+                  ? 'bg-white dark:bg-[#1a3832] text-slate-900 dark:text-white shadow-sm'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
               }`}
             >
               Semua Koleksi ({collections.length})
             </button>
             <button
               onClick={() => setTypeFilter('books')}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5 ${
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
                 typeFilter === 'books'
-                  ? 'bg-white dark:bg-sage-800 text-emerald-700 dark:text-emerald-400 shadow-sm'
-                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-900'
+                  ? 'bg-white dark:bg-[#1a3832] text-emerald-700 dark:text-emerald-400 shadow-sm'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
               }`}
             >
               <BookOpen className="w-3.5 h-3.5" />
@@ -294,10 +295,10 @@ export default function Collections() {
             </button>
             <button
               onClick={() => setTypeFilter('assets')}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5 ${
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
                 typeFilter === 'assets'
-                  ? 'bg-white dark:bg-sage-800 text-emerald-700 dark:text-emerald-400 shadow-sm'
-                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-900'
+                  ? 'bg-white dark:bg-[#1a3832] text-emerald-700 dark:text-emerald-400 shadow-sm'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
               }`}
             >
               <Cpu className="w-3.5 h-3.5" />
@@ -307,32 +308,32 @@ export default function Collections() {
 
           {/* Quick test search presets */}
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-slate-400 flex items-center gap-1">
-              <Barcode className="w-3.5 h-3.5 text-emerald-500" />
+            <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1">
+              <Barcode className="w-3.5 h-3.5 text-emerald-600" />
               Tes Scan:
             </span>
             <button
               onClick={() => setSearch('Clean Code')}
-              className="px-2 py-1 rounded-md text-[11px] bg-sand-100 dark:bg-sage-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 text-slate-600 dark:text-slate-300 font-mono transition"
+              className="px-2.5 py-1 rounded-md text-[11px] bg-slate-100 dark:bg-slate-800 hover:bg-emerald-100 dark:hover:bg-emerald-950 text-slate-700 dark:text-slate-200 font-mono font-semibold border border-slate-200 dark:border-slate-700 transition"
             >
               Clean Code
             </button>
             <button
               onClick={() => setSearch('ISBN-978')}
-              className="px-2 py-1 rounded-md text-[11px] bg-sand-100 dark:bg-sage-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 text-slate-600 dark:text-slate-300 font-mono transition"
+              className="px-2.5 py-1 rounded-md text-[11px] bg-slate-100 dark:bg-slate-800 hover:bg-emerald-100 dark:hover:bg-emerald-950 text-slate-700 dark:text-slate-200 font-mono font-semibold border border-slate-200 dark:border-slate-700 transition"
             >
               ISBN-978
             </button>
             <button
               onClick={() => setSearch('AST-')}
-              className="px-2 py-1 rounded-md text-[11px] bg-sand-100 dark:bg-sage-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 text-slate-600 dark:text-slate-300 font-mono transition"
+              className="px-2.5 py-1 rounded-md text-[11px] bg-slate-100 dark:bg-slate-800 hover:bg-emerald-100 dark:hover:bg-emerald-950 text-slate-700 dark:text-slate-200 font-mono font-semibold border border-slate-200 dark:border-slate-700 transition"
             >
               AST-
             </button>
             {search && (
               <button
                 onClick={() => setSearch('')}
-                className="px-2 py-1 rounded-md text-[11px] text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition font-medium"
+                className="px-2.5 py-1 rounded-md text-[11px] text-rose-600 hover:bg-rose-50 font-bold transition"
               >
                 Reset
               </button>
@@ -343,13 +344,13 @@ export default function Collections() {
         {/* Inputs row */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <div className="relative">
-            <Search className="w-4 h-4 absolute left-3.5 top-3 text-slate-400" />
+            <Search className="w-4 h-4 absolute left-3.5 top-3 text-slate-500" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Cari ISBN, judul, atau kode aset..."
-              className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-sand-300 dark:border-sage-700 bg-sand-50/50 dark:bg-sage-950 text-slate-900 dark:text-white text-xs outline-none focus:ring-2 focus:ring-emerald-500 transition"
+              className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#0c1815] text-slate-900 dark:text-white text-xs outline-none focus:ring-2 focus:ring-emerald-500 transition font-medium"
             />
           </div>
 
@@ -357,7 +358,7 @@ export default function Collections() {
             <select
               value={categoryId}
               onChange={(e) => setCategoryId(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-xl border border-sand-300 dark:border-sage-700 bg-sand-50/50 dark:bg-sage-950 text-slate-900 dark:text-white text-xs outline-none focus:ring-2 focus:ring-emerald-500 transition"
+              className="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#0c1815] text-slate-900 dark:text-white text-xs outline-none focus:ring-2 focus:ring-emerald-500 transition font-medium"
             >
               <option value="">Semua Kategori</option>
               {categories.map((cat) => (
@@ -370,7 +371,7 @@ export default function Collections() {
             <select
               value={status}
               onChange={(e) => setStatus(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-xl border border-sand-300 dark:border-sage-700 bg-sand-50/50 dark:bg-sage-950 text-slate-900 dark:text-white text-xs outline-none focus:ring-2 focus:ring-emerald-500 transition"
+              className="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#0c1815] text-slate-900 dark:text-white text-xs outline-none focus:ring-2 focus:ring-emerald-500 transition font-medium"
             >
               {STATUS_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -382,7 +383,7 @@ export default function Collections() {
             <select
               value={condition}
               onChange={(e) => setCondition(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-xl border border-sand-300 dark:border-sage-700 bg-sand-50/50 dark:bg-sage-950 text-slate-900 dark:text-white text-xs outline-none focus:ring-2 focus:ring-emerald-500 transition"
+              className="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#0c1815] text-slate-900 dark:text-white text-xs outline-none focus:ring-2 focus:ring-emerald-500 transition font-medium"
             >
               {CONDITION_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -396,12 +397,12 @@ export default function Collections() {
       {loading ? (
         <div className="flex flex-col items-center justify-center py-20 text-slate-400">
           <RefreshCw className="w-8 h-8 animate-spin text-emerald-600 mb-2" />
-          <p className="text-sm">Menyelaraskan data katalog...</p>
+          <p className="text-sm font-semibold">Menyelaraskan data katalog...</p>
         </div>
       ) : filteredCollections.length === 0 ? (
-        <div className="text-center py-16 bg-white dark:bg-sage-900 rounded-2xl border border-sand-200 dark:border-sage-800 p-8">
+        <div className="text-center py-16 bg-white dark:bg-[#122420] rounded-2xl border border-slate-200 dark:border-slate-800 p-8">
           <BookOpen className="w-12 h-12 mx-auto text-slate-300 dark:text-slate-600 mb-3" />
-          <h3 className="text-base font-semibold text-slate-800 dark:text-slate-200">
+          <h3 className="text-base font-bold text-slate-800 dark:text-slate-200">
             Tidak ada koleksi yang cocok
           </h3>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto">
@@ -415,10 +416,10 @@ export default function Collections() {
             return (
               <div
                 key={col.id}
-                className="group flex flex-col justify-between bg-white dark:bg-sage-900 rounded-2xl border border-sand-200 dark:border-sage-800 shadow-sm hover:shadow-md hover:border-emerald-300 dark:hover:border-emerald-700 transition overflow-hidden"
+                className="group flex flex-col justify-between bg-white dark:bg-[#122420] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-emerald-500 transition overflow-hidden"
               >
                 {/* Visual Header / Cover */}
-                <div className="relative h-44 bg-gradient-to-br from-sand-100 via-sand-50 to-emerald-50/40 dark:from-sage-950 dark:via-sage-900 dark:to-sage-800 flex items-center justify-center p-4 border-b border-sand-100 dark:border-sage-800 overflow-hidden">
+                <div className="relative h-44 bg-gradient-to-br from-slate-100 via-slate-50 to-emerald-50 dark:from-[#0c1815] dark:via-[#11241f] dark:to-[#16302a] flex items-center justify-center p-4 border-b border-slate-100 dark:border-slate-800 overflow-hidden">
                   {getCoverUrl(col.cover_image_path) ? (
                     <img
                       src={getCoverUrl(col.cover_image_path)}
@@ -427,10 +428,10 @@ export default function Collections() {
                     />
                   ) : (
                     <div className="flex flex-col items-center justify-center text-center p-4">
-                      <div className="w-12 h-12 rounded-xl bg-white/80 dark:bg-sage-800/80 shadow flex items-center justify-center text-emerald-700 dark:text-emerald-400 mb-2">
+                      <div className="w-12 h-12 rounded-xl bg-white dark:bg-[#1a3832] shadow flex items-center justify-center text-emerald-700 dark:text-emerald-400 mb-2 font-bold">
                         {isAsset ? <Cpu className="w-6 h-6" /> : <BookOpen className="w-6 h-6" />}
                       </div>
-                      <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 dark:text-slate-500 font-semibold truncate max-w-[180px]">
+                      <span className="text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 font-bold truncate max-w-[180px]">
                         {col.code}
                       </span>
                     </div>
@@ -439,12 +440,12 @@ export default function Collections() {
                   {/* Top Badges */}
                   <div className="absolute top-2.5 left-2.5 flex flex-wrap gap-1.5">
                     <span
-                      className={`px-2 py-0.5 rounded-full text-[10px] font-semibold tracking-wide uppercase ${
+                      className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase ${
                         col.status === 'available'
-                          ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/40'
+                          ? 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300'
                           : col.status === 'borrowed'
-                          ? 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-200 dark:border-amber-800/40'
-                          : 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300'
+                          ? 'bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-300 border border-amber-300'
+                          : 'bg-rose-100 text-rose-900 dark:bg-rose-950 dark:text-rose-300'
                       }`}
                     >
                       {col.status === 'available' ? 'Tersedia' : col.status === 'borrowed' ? 'Dipinjam' : col.status}
@@ -453,7 +454,7 @@ export default function Collections() {
 
                   <button
                     onClick={() => setBarcodeModalItem(col)}
-                    className="absolute top-2.5 right-2.5 p-1.5 rounded-lg bg-white/90 dark:bg-sage-800/90 text-slate-600 dark:text-slate-300 hover:text-emerald-600 shadow-sm border border-sand-200 dark:border-sage-700 transition"
+                    className="absolute top-2.5 right-2.5 p-1.5 rounded-lg bg-white dark:bg-[#1a3832] text-slate-700 dark:text-slate-200 hover:text-emerald-600 shadow border border-slate-200 dark:border-slate-700 transition"
                     title="Cetak Barcode Tag"
                   >
                     <Barcode className="w-4 h-4" />
@@ -463,31 +464,31 @@ export default function Collections() {
                 {/* Content body */}
                 <div className="p-4 flex-1 flex flex-col justify-between">
                   <div>
-                    <div className="flex items-center gap-1.5 text-[11px] text-emerald-700 dark:text-emerald-400 font-medium mb-1">
+                    <div className="flex items-center gap-1.5 text-[11px] text-emerald-800 dark:text-emerald-400 font-bold mb-1">
                       <span>{col.category?.name || 'Umum'}</span>
                       <span>•</span>
-                      <span className="font-mono text-slate-400">{isAsset ? 'Aset Fisik' : 'Buku'}</span>
+                      <span className="font-mono text-slate-500">{isAsset ? 'Aset Fisik' : 'Buku'}</span>
                     </div>
 
-                    <h3 className="font-semibold text-sm text-slate-900 dark:text-white line-clamp-2 leading-snug">
+                    <h3 className="font-bold text-sm text-slate-900 dark:text-white line-clamp-2 leading-snug">
                       {col.title}
                     </h3>
-                    <p className="text-[11px] font-mono text-slate-400 mt-1 truncate">
+                    <p className="text-[11px] font-mono font-semibold text-slate-500 dark:text-slate-400 mt-1 truncate">
                       {col.code}
                     </p>
                   </div>
 
                   {/* Stock meter */}
-                  <div className="mt-4 pt-3 border-t border-sand-100 dark:border-sage-800/80">
-                    <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-300 mb-1.5">
+                  <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
+                    <div className="flex items-center justify-between text-xs text-slate-700 dark:text-slate-300 mb-1.5 font-medium">
                       <span className="text-[11px]">Ketersediaan</span>
-                      <span className="font-mono font-semibold">
+                      <span className="font-mono font-bold">
                         {col.available_stock} / {col.total_stock} Unit
                       </span>
                     </div>
-                    <div className="w-full bg-sand-200 dark:bg-sage-950 h-1.5 rounded-full overflow-hidden">
+                    <div className="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
                       <div
-                        className="bg-emerald-500 h-full rounded-full transition-all duration-500"
+                        className="bg-emerald-600 h-full rounded-full transition-all duration-500"
                         style={{
                           width: `${Math.min(100, Math.max(0, (col.available_stock / (col.total_stock || 1)) * 100))}%`,
                         }}
@@ -500,28 +501,28 @@ export default function Collections() {
                     {col.status === 'available' && col.available_stock > 0 ? (
                       <button
                         onClick={() => handleBorrow(col.id, col.title)}
-                        className="flex-1 py-1.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-xs font-semibold shadow-sm transition"
+                        className="flex-1 py-1.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-xs font-bold shadow-sm transition"
                       >
                         Pinjam Cepat
                       </button>
                     ) : (
-                      <span className="flex-1 text-center py-1.5 px-3 rounded-xl bg-sand-100 dark:bg-sage-950 text-slate-400 text-xs font-medium">
+                      <span className="flex-1 text-center py-1.5 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs font-semibold">
                         Tidak Tersedia
                       </span>
                     )}
 
-                    {hasRole('admin', 'staff') && (
+                    {!isMember && hasRole('admin', 'staff') && (
                       <div className="flex items-center gap-1">
                         <button
                           onClick={() => openEditModal(col)}
-                          className="p-1.5 rounded-lg border border-sand-200 dark:border-sage-700 hover:bg-sand-100 dark:hover:bg-sage-800 text-slate-600 dark:text-slate-300 transition"
+                          className="p-1.5 rounded-lg border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition"
                           title="Edit Koleksi"
                         >
                           <Edit2 className="w-3.5 h-3.5" />
                         </button>
                         <button
                           onClick={() => handleDelete(col.id)}
-                          className="p-1.5 rounded-lg border border-sand-200 dark:border-sage-700 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-rose-500 transition"
+                          className="p-1.5 rounded-lg border border-slate-300 dark:border-slate-700 hover:bg-rose-50 text-rose-600 transition"
                           title="Hapus Koleksi"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -542,17 +543,17 @@ export default function Collections() {
           <button
             onClick={() => handlePageChange(pagination.currentPage - 1)}
             disabled={pagination.currentPage <= 1}
-            className="px-3 py-1.5 text-xs font-medium rounded-xl border border-sand-300 dark:border-sage-700 bg-white dark:bg-sage-900 disabled:opacity-40 transition"
+            className="px-3.5 py-1.5 text-xs font-bold rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 disabled:opacity-40 transition"
           >
             Sebelumnya
           </button>
-          <span className="text-xs font-mono text-slate-500">
+          <span className="text-xs font-mono font-bold text-slate-600 dark:text-slate-400">
             Halaman {pagination.currentPage} dari {pagination.lastPage}
           </span>
           <button
             onClick={() => handlePageChange(pagination.currentPage + 1)}
             disabled={pagination.currentPage >= pagination.lastPage}
-            className="px-3 py-1.5 text-xs font-medium rounded-xl border border-sand-300 dark:border-sage-700 bg-white dark:bg-sage-900 disabled:opacity-40 transition"
+            className="px-3.5 py-1.5 text-xs font-bold rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 disabled:opacity-40 transition"
           >
             Selanjutnya
           </button>
@@ -562,14 +563,14 @@ export default function Collections() {
       {/* Create / Edit Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
-          <div className="bg-white dark:bg-sage-900 rounded-2xl shadow-2xl border border-sand-200 dark:border-sage-800 w-full max-w-lg max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-sand-200 dark:border-sage-800 flex items-center justify-between">
-              <h2 className="text-base font-bold text-slate-900 dark:text-white">
+          <div className="bg-white dark:bg-[#122420] rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+              <h2 className="text-base font-extrabold text-slate-900 dark:text-white">
                 {editing ? 'Perbarui Data Koleksi' : 'Tambah Koleksi / Aset Perpustakaan'}
               </h2>
               <button
                 onClick={() => setShowModal(false)}
-                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-sm font-semibold"
+                className="text-slate-400 hover:text-slate-600 font-bold"
               >
                 ✕
               </button>
@@ -577,7 +578,7 @@ export default function Collections() {
 
             <form onSubmit={handleSubmit} className="p-6 space-y-4 text-xs">
               <div>
-                <label className="block font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1">
+                <label className="block font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
                   Kode Identifikasi / Barcode / ISBN *
                 </label>
                 <div className="flex gap-2">
@@ -587,13 +588,13 @@ export default function Collections() {
                     value={form.code}
                     onChange={handleFormChange}
                     required
-                    className="flex-1 px-3 py-2 rounded-xl border border-sand-300 dark:border-sage-700 bg-sand-50/50 dark:bg-sage-950 text-slate-900 dark:text-white font-mono outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="flex-1 px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#0c1815] text-slate-900 dark:text-white font-mono font-bold outline-none focus:ring-2 focus:ring-emerald-500"
                     placeholder="ISBN-978-0132350884 atau AST-001"
                   />
                   <button
                     type="button"
                     onClick={() => handleGenerateCode('isbn')}
-                    className="px-2.5 py-2 rounded-xl bg-sand-100 dark:bg-sage-800 hover:bg-emerald-100 text-slate-700 dark:text-slate-200 font-medium"
+                    className="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-emerald-100 text-slate-800 dark:text-slate-200 font-bold border border-slate-300 dark:border-slate-700"
                     title="Buat ISBN Acak"
                   >
                     + ISBN
@@ -601,7 +602,7 @@ export default function Collections() {
                   <button
                     type="button"
                     onClick={() => handleGenerateCode('asset')}
-                    className="px-2.5 py-2 rounded-xl bg-sand-100 dark:bg-sage-800 hover:bg-emerald-100 text-slate-700 dark:text-slate-200 font-medium"
+                    className="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-emerald-100 text-slate-800 dark:text-slate-200 font-bold border border-slate-300 dark:border-slate-700"
                     title="Buat Kode Aset"
                   >
                     + Aset
@@ -610,7 +611,7 @@ export default function Collections() {
               </div>
 
               <div>
-                <label className="block font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1">
+                <label className="block font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
                   Judul Koleksi / Nama Aset *
                 </label>
                 <input
@@ -619,14 +620,14 @@ export default function Collections() {
                   value={form.title}
                   onChange={handleFormChange}
                   required
-                  className="w-full px-3 py-2 rounded-xl border border-sand-300 dark:border-sage-700 bg-sand-50/50 dark:bg-sage-950 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#0c1815] text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500 font-medium"
                   placeholder="Contoh: Clean Architecture (Robert C. Martin)"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1">
+                  <label className="block font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
                     Kategori *
                   </label>
                   <select
@@ -634,7 +635,7 @@ export default function Collections() {
                     value={form.category_id}
                     onChange={handleFormChange}
                     required
-                    className="w-full px-3 py-2 rounded-xl border border-sand-300 dark:border-sage-700 bg-sand-50/50 dark:bg-sage-950 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#0c1815] text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500 font-medium"
                   >
                     {categories.map((c) => (
                       <option key={c.id} value={c.id}>{c.name}</option>
@@ -643,7 +644,7 @@ export default function Collections() {
                 </div>
 
                 <div>
-                  <label className="block font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1">
+                  <label className="block font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
                     Total Stok Unit *
                   </label>
                   <input
@@ -653,21 +654,21 @@ export default function Collections() {
                     value={form.total_stock}
                     onChange={handleFormChange}
                     required
-                    className="w-full px-3 py-2 rounded-xl border border-sand-300 dark:border-sage-700 bg-sand-50/50 dark:bg-sage-950 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#0c1815] text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500 font-bold"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1">
+                  <label className="block font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
                     Kondisi Fisik
                   </label>
                   <select
                     name="condition"
                     value={form.condition}
                     onChange={handleFormChange}
-                    className="w-full px-3 py-2 rounded-xl border border-sand-300 dark:border-sage-700 bg-sand-50/50 dark:bg-sage-950 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#0c1815] text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500 font-medium"
                   >
                     <option value="good">Baik</option>
                     <option value="fair">Cukup</option>
@@ -676,14 +677,14 @@ export default function Collections() {
                 </div>
 
                 <div>
-                  <label className="block font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1">
+                  <label className="block font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
                     Status Sirkulasi
                   </label>
                   <select
                     name="status"
                     value={form.status}
                     onChange={handleFormChange}
-                    className="w-full px-3 py-2 rounded-xl border border-sand-300 dark:border-sage-700 bg-sand-50/50 dark:bg-sage-950 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#0c1815] text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500 font-medium"
                   >
                     <option value="available">Tersedia</option>
                     <option value="borrowed">Dipinjam</option>
@@ -693,31 +694,18 @@ export default function Collections() {
                 </div>
               </div>
 
-              <div>
-                <label className="block font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1">
-                  Gambar Sampul (Opsional)
-                </label>
-                <input
-                  type="file"
-                  name="cover_image"
-                  accept="image/*"
-                  onChange={handleFormChange}
-                  className="w-full px-3 py-1.5 rounded-xl border border-sand-300 dark:border-sage-700 bg-sand-50/50 dark:bg-sage-950 text-slate-600 dark:text-slate-300 text-xs"
-                />
-              </div>
-
-              <div className="pt-4 border-t border-sand-200 dark:border-sage-800 flex justify-end gap-2">
+              <div className="pt-4 border-t border-slate-200 dark:border-slate-800 flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 rounded-xl border border-sand-300 dark:border-sage-700 text-slate-600 dark:text-slate-300 hover:bg-sand-100"
+                  className="px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 font-bold"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold disabled:opacity-50 transition"
+                  className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold disabled:opacity-50 transition"
                 >
                   {submitting ? 'Menyimpan...' : 'Simpan Koleksi'}
                 </button>
@@ -730,32 +718,32 @@ export default function Collections() {
       {/* Barcode Tag Printable Modal */}
       {barcodeModalItem && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-sage-900 rounded-2xl shadow-2xl border border-sand-200 dark:border-sage-800 w-full max-w-sm p-6 text-center">
-            <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto mb-3">
+          <div className="bg-white dark:bg-[#122420] rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-sm p-6 text-center">
+            <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 flex items-center justify-center mx-auto mb-3 font-bold">
               <Barcode className="w-6 h-6" />
             </div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-white">
+            <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
               Label Barcode Inventaris
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
               Siap dicetak pada stiker thermal barcode
             </p>
 
-            <div className="my-5 p-4 bg-white border-2 border-dashed border-slate-300 rounded-xl text-black">
-              <div className="text-[11px] font-bold uppercase tracking-wider">
+            <div className="my-5 p-4 bg-white border-2 border-dashed border-slate-400 rounded-xl text-black">
+              <div className="text-[11px] font-bold uppercase tracking-wider text-slate-900">
                 ARCHIVE & ASSET SYSTEM
               </div>
-              <div className="text-xs font-semibold mt-1 truncate">
+              <div className="text-xs font-bold mt-1 truncate text-slate-900">
                 {barcodeModalItem.title}
               </div>
               {/* Simulated Barcode */}
-              <div className="my-3 flex items-center justify-center h-12 bg-slate-900 px-4 rounded text-white tracking-[6px] font-mono text-sm">
+              <div className="my-3 flex items-center justify-center h-12 bg-slate-950 px-4 rounded text-white tracking-[6px] font-mono text-sm">
                 |||| | ||||| || |||
               </div>
-              <div className="text-xs font-mono font-bold tracking-widest">
+              <div className="text-xs font-mono font-black tracking-widest text-slate-900">
                 {barcodeModalItem.code}
               </div>
-              <div className="text-[10px] text-slate-500 mt-1">
+              <div className="text-[10px] text-slate-600 mt-1 font-semibold">
                 Kategori: {barcodeModalItem.category?.name || 'Umum'} • Rak A-02
               </div>
             </div>
@@ -763,7 +751,7 @@ export default function Collections() {
             <div className="flex gap-2">
               <button
                 onClick={() => setBarcodeModalItem(null)}
-                className="flex-1 py-2 rounded-xl border border-sand-300 dark:border-sage-700 text-xs font-semibold text-slate-600 dark:text-slate-300"
+                className="flex-1 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-300"
               >
                 Tutup
               </button>
@@ -772,7 +760,7 @@ export default function Collections() {
                   window.print()
                   toast.success('Perintah cetak dikirim ke printer label')
                 }}
-                className="flex-1 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-xs font-semibold text-white flex items-center justify-center gap-1.5 shadow"
+                className="flex-1 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-xs font-bold text-white flex items-center justify-center gap-1.5 shadow"
               >
                 <Printer className="w-3.5 h-3.5" />
                 Cetak Label

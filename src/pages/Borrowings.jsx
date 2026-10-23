@@ -27,14 +27,16 @@ const STATUS_LABELS = {
 }
 
 const STATUS_CLASSES = {
-  borrowed: 'bg-blue-100 text-blue-800 dark:bg-blue-950/70 dark:text-blue-300 border border-blue-200 dark:border-blue-800/40',
-  returned: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/40',
-  overdue: 'bg-rose-100 text-rose-800 dark:bg-rose-950/70 dark:text-rose-300 border border-rose-200 dark:border-rose-800/40',
-  cancelled: 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300',
+  borrowed: 'bg-blue-100 text-blue-900 dark:bg-blue-950 dark:text-blue-300 border border-blue-300 font-bold',
+  returned: 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300 font-bold',
+  overdue: 'bg-rose-100 text-rose-900 dark:bg-rose-950 dark:text-rose-300 border border-rose-300 font-bold',
+  cancelled: 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300 font-bold',
 }
 
 export default function Borrowings() {
   const { user, hasRole } = useAuth()
+  const isMember = user?.role === 'member'
+
   const [borrowings, setBorrowings] = useState([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('')
@@ -60,7 +62,7 @@ export default function Borrowings() {
     try {
       const params = { page, per_page: 10 }
       if (filter) params.status = filter
-
+      // If member, backend scopes to their user_id automatically
       const res = await api.get('/borrowings', { params })
       const d = res.data.data
       const borrowingsData = Array.isArray(d) ? d : (d.data || [])
@@ -71,7 +73,7 @@ export default function Borrowings() {
         total: d.total || borrowingsData.length,
       })
     } catch (err) {
-      toast.error('Gagal memuat data sirkulasi peminjaman')
+      toast.error('Gagal memuat data peminjaman')
     } finally {
       setLoading(false)
     }
@@ -148,7 +150,6 @@ export default function Borrowings() {
   }
 
   const openReturnModal = (borrowing) => {
-    // Calculate late days
     const due = new Date(borrowing.due_date)
     const now = new Date()
     const diffTime = now - due
@@ -203,19 +204,21 @@ export default function Borrowings() {
       {/* Header bar */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2.5">
+          <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white flex items-center gap-2.5">
             <ArrowLeftRight className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
-            Sirkulasi Peminjaman & Pengembalian
+            {isMember ? 'Riwayat Peminjaman Buku Saya' : 'Sirkulasi Peminjaman & Pengembalian'}
           </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            Total {pagination.total} transaksi sirkulasi aktif & terekam
+          <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
+            {isMember
+              ? `Total ${pagination.total} riwayat sirkulasi pada akun Anda`
+              : `Total ${pagination.total} transaksi sirkulasi aktif & terekam`}
           </p>
         </div>
 
-        {hasRole('admin', 'staff') && (
+        {!isMember && hasRole('admin', 'staff') && (
           <button
             onClick={openFastCheckoutModal}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-md transition transform hover:-translate-y-0.5"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md transition transform hover:-translate-y-0.5"
           >
             <Plus className="w-4 h-4" />
             Fast Check-out (Peminjaman Cepat)
@@ -223,10 +226,10 @@ export default function Borrowings() {
         )}
       </div>
 
-      {/* Filter Tabs & Status Overview */}
-      <div className="bg-white dark:bg-sage-900 rounded-2xl border border-sand-200 dark:border-sage-800 p-4 shadow-sm flex flex-wrap items-center justify-between gap-4">
+      {/* Filter Tabs & Status Overview - High Contrast */}
+      <div className="bg-white dark:bg-[#122420] rounded-2xl border border-slate-200 dark:border-slate-800 p-4 shadow-sm flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5 mr-1">
+          <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5 mr-1">
             <Filter className="w-3.5 h-3.5" />
             Filter:
           </span>
@@ -239,10 +242,10 @@ export default function Borrowings() {
             <button
               key={tab.key}
               onClick={() => setFilter(tab.key)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-medium transition ${
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition ${
                 filter === tab.key
                   ? 'bg-emerald-600 text-white shadow-sm'
-                  : 'bg-sand-100 dark:bg-sage-950 text-slate-600 dark:text-slate-300 hover:bg-sand-200 dark:hover:bg-sage-800'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200'
               }`}
             >
               {tab.label}
@@ -250,77 +253,83 @@ export default function Borrowings() {
           ))}
         </div>
 
-        <div className="text-xs text-slate-500 dark:text-slate-400 font-mono">
-          Tarif Denda Otomatis: <span className="font-semibold text-emerald-600 dark:text-emerald-400">Rp 3.000 / hari</span>
+        <div className="text-xs text-slate-600 dark:text-slate-400 font-mono font-medium">
+          Tarif Denda Otomatis: <span className="font-bold text-emerald-700 dark:text-emerald-400">Rp 3.000 / hari</span>
         </div>
       </div>
 
       {/* Table Card */}
-      <div className="bg-white dark:bg-sage-900 rounded-2xl border border-sand-200 dark:border-sage-800 shadow-sm overflow-hidden">
+      <div className="bg-white dark:bg-[#122420] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
         {loading ? (
           <div className="py-20 text-center text-slate-400">
             <div className="w-8 h-8 mx-auto border-2 border-emerald-600 border-t-transparent rounded-full animate-spin mb-2" />
-            <p className="text-xs">Memuat riwayat transaksi sirkulasi...</p>
+            <p className="text-xs font-bold">Memuat riwayat transaksi sirkulasi...</p>
           </div>
         ) : borrowings.length === 0 ? (
           <div className="py-16 text-center text-slate-400 p-6">
             <ArrowLeftRight className="w-12 h-12 mx-auto text-slate-300 dark:text-slate-600 mb-3" />
-            <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-              Tidak ada data transaksi peminjaman
+            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">
+              {isMember ? 'Anda belum memiliki pinjaman aktif' : 'Tidak ada data transaksi peminjaman'}
             </h3>
-            <p className="text-xs text-slate-400 mt-1">Gunakan tombol Fast Check-out untuk membuat peminjaman baru.</p>
+            <p className="text-xs text-slate-500 mt-1">
+              {isMember
+                ? 'Kunjungi katalog koleksi untuk meminjam buku pilihan Anda.'
+                : 'Gunakan tombol Fast Check-out untuk membuat peminjaman baru.'}
+            </p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-sand-50 dark:bg-sage-950 text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider border-b border-sand-200 dark:border-sage-800">
+              <thead className="bg-slate-100 dark:bg-[#0c1815] text-slate-700 dark:text-slate-200 font-bold uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
                 <tr>
-                  <th className="py-3.5 px-5">ID & Koleksi</th>
-                  <th className="py-3.5 px-5">Peminjam</th>
+                  <th className="py-3.5 px-5">Koleksi Buku / Aset</th>
+                  {!isMember && <th className="py-3.5 px-5">Peminjam</th>}
                   <th className="py-3.5 px-5">Waktu Pinjam</th>
                   <th className="py-3.5 px-5">Jatuh Tempo</th>
                   <th className="py-3.5 px-5">Pengembalian</th>
                   <th className="py-3.5 px-5 text-center">Status</th>
-                  <th className="py-3.5 px-5 text-right">Aksi Sirkulasi</th>
+                  <th className="py-3.5 px-5 text-right">Aksi</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-sand-100 dark:divide-sage-800/60">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80">
                 {borrowings.map((b) => (
-                  <tr key={b.id} className="hover:bg-sand-50/50 dark:hover:bg-sage-800/30 transition">
+                  <tr key={b.id} className="hover:bg-slate-50 dark:hover:bg-white/5 transition">
                     <td className="py-3.5 px-5">
-                      <div className="font-semibold text-slate-900 dark:text-white max-w-[220px] truncate">
+                      <div className="font-bold text-slate-900 dark:text-white max-w-[220px] truncate">
                         {b.collection?.title || 'Koleksi Tanpa Judul'}
                       </div>
-                      <div className="text-[11px] font-mono text-slate-400 mt-0.5">
+                      <div className="text-[11px] font-mono text-slate-500 font-semibold mt-0.5">
                         {b.collection?.code || `ID: #${b.id}`}
                       </div>
                     </td>
 
-                    <td className="py-3.5 px-5">
-                      <div className="font-medium text-slate-800 dark:text-slate-200">
-                        {b.user?.name || 'Member'}
-                      </div>
-                      <div className="text-[11px] text-slate-400">
-                        {b.user?.email || 'member@library.test'}
-                      </div>
-                    </td>
+                    {!isMember && (
+                      <td className="py-3.5 px-5">
+                        <div className="font-bold text-slate-800 dark:text-slate-200">
+                          {b.user?.name || 'Member'}
+                        </div>
+                        <div className="text-[11px] text-slate-500">
+                          {b.user?.email || 'member@library.test'}
+                        </div>
+                      </td>
+                    )}
 
-                    <td className="py-3.5 px-5 font-mono text-slate-600 dark:text-slate-300">
+                    <td className="py-3.5 px-5 font-mono text-slate-700 dark:text-slate-300 font-medium">
                       {formatDate(b.borrowed_at)}
                     </td>
 
-                    <td className="py-3.5 px-5 font-mono text-slate-600 dark:text-slate-300">
+                    <td className="py-3.5 px-5 font-mono text-slate-700 dark:text-slate-300 font-bold">
                       {formatDate(b.due_date)}
                     </td>
 
-                    <td className="py-3.5 px-5 font-mono text-slate-500 dark:text-slate-400">
+                    <td className="py-3.5 px-5 font-mono text-slate-600 dark:text-slate-400">
                       {b.returned_at ? formatDateTime(b.returned_at) : (
-                        <span className="text-amber-600 dark:text-amber-400 font-sans text-[11px]">Belum Kembali</span>
+                        <span className="text-amber-700 dark:text-amber-400 font-sans text-[11px] font-bold">Belum Kembali</span>
                       )}
                     </td>
 
                     <td className="py-3.5 px-5 text-center">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold tracking-wide ${STATUS_CLASSES[b.status] || STATUS_CLASSES.borrowed}`}>
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wide ${STATUS_CLASSES[b.status] || STATUS_CLASSES.borrowed}`}>
                         {STATUS_LABELS[b.status] || b.status}
                       </span>
                     </td>
@@ -329,16 +338,16 @@ export default function Borrowings() {
                       <div className="flex items-center justify-end gap-2">
                         <button
                           onClick={() => setShowDetail(b)}
-                          className="px-2.5 py-1.5 rounded-lg border border-sand-300 dark:border-sage-700 hover:bg-sand-100 dark:hover:bg-sage-800 text-slate-600 dark:text-slate-300 transition"
+                          className="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold transition"
                           title="Lihat Detail Transaksi"
                         >
                           <Eye className="w-3.5 h-3.5" />
                         </button>
 
-                        {hasRole('admin', 'staff') && (b.status === 'borrowed' || b.status === 'overdue') && (
+                        {!isMember && hasRole('admin', 'staff') && (b.status === 'borrowed' || b.status === 'overdue') && (
                           <button
                             onClick={() => openReturnModal(b)}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-medium shadow-sm transition"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-sm transition"
                           >
                             <RotateCcw className="w-3.5 h-3.5" />
                             Kembalikan
@@ -355,22 +364,22 @@ export default function Borrowings() {
 
         {/* Pagination */}
         {pagination.lastPage > 1 && (
-          <div className="p-4 border-t border-sand-200 dark:border-sage-800 flex justify-between items-center text-xs">
-            <span className="text-slate-500 font-mono">
+          <div className="p-4 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center text-xs">
+            <span className="text-slate-600 font-mono font-bold">
               Halaman {pagination.currentPage} dari {pagination.lastPage} ({pagination.total} total data)
             </span>
             <div className="flex gap-1.5">
               <button
                 onClick={() => fetchBorrowings(pagination.currentPage - 1)}
                 disabled={pagination.currentPage <= 1}
-                className="px-3 py-1.5 rounded-lg border border-sand-300 dark:border-sage-700 disabled:opacity-40 hover:bg-sand-100 dark:hover:bg-sage-800"
+                className="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 disabled:opacity-40 hover:bg-slate-100 font-bold"
               >
                 Prev
               </button>
               <button
                 onClick={() => fetchBorrowings(pagination.currentPage + 1)}
                 disabled={pagination.currentPage >= pagination.lastPage}
-                className="px-3 py-1.5 rounded-lg border border-sand-300 dark:border-sage-700 disabled:opacity-40 hover:bg-sand-100 dark:hover:bg-sage-800"
+                className="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 disabled:opacity-40 hover:bg-slate-100 font-bold"
               >
                 Next
               </button>
@@ -382,10 +391,10 @@ export default function Borrowings() {
       {/* Fast Check-out Modal */}
       {showFastCheckout && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
-          <div className="bg-white dark:bg-sage-900 rounded-2xl shadow-2xl border border-sand-200 dark:border-sage-800 w-full max-w-lg overflow-hidden">
-            <div className="p-6 border-b border-sand-200 dark:border-sage-800 flex items-center justify-between">
+          <div className="bg-white dark:bg-[#122420] rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-lg overflow-hidden">
+            <div className="p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
               <div>
-                <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <h2 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
                   <Plus className="w-5 h-5 text-emerald-600" />
                   Fast Check-out (Peminjaman Cepat)
                 </h2>
@@ -395,7 +404,7 @@ export default function Borrowings() {
               </div>
               <button
                 onClick={() => setShowFastCheckout(false)}
-                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-semibold"
+                className="text-slate-400 hover:text-slate-600 font-bold"
               >
                 ✕
               </button>
@@ -403,14 +412,14 @@ export default function Borrowings() {
 
             <form onSubmit={handleFastCheckoutSubmit} className="p-6 space-y-4 text-xs">
               <div>
-                <label className="block font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
+                <label className="block font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
                   Pilih Koleksi Buku / Aset Fisik *
                 </label>
                 <select
                   value={checkoutForm.collection_id}
                   onChange={(e) => setCheckoutForm({ ...checkoutForm, collection_id: e.target.value })}
                   required
-                  className="w-full px-3 py-2.5 rounded-xl border border-sand-300 dark:border-sage-700 bg-sand-50/50 dark:bg-sage-950 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#0c1815] text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500 font-medium"
                 >
                   <option value="">-- Pilih Koleksi Tersedia --</option>
                   {availableCollections.map((c) => (
@@ -422,14 +431,14 @@ export default function Borrowings() {
               </div>
 
               <div>
-                <label className="block font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
+                <label className="block font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
                   Pilih Member Peminjam *
                 </label>
                 <select
                   value={checkoutForm.user_id}
                   onChange={(e) => setCheckoutForm({ ...checkoutForm, user_id: e.target.value })}
                   required
-                  className="w-full px-3 py-2.5 rounded-xl border border-sand-300 dark:border-sage-700 bg-sand-50/50 dark:bg-sage-950 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#0c1815] text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500 font-medium"
                 >
                   {memberOptions.map((m) => (
                     <option key={m.id} value={m.id}>
@@ -440,7 +449,7 @@ export default function Borrowings() {
               </div>
 
               <div>
-                <label className="block font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
+                <label className="block font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
                   Durasi Peminjaman Standar
                 </label>
                 <div className="grid grid-cols-3 gap-2">
@@ -453,10 +462,10 @@ export default function Borrowings() {
                       key={preset.days}
                       type="button"
                       onClick={() => setCheckoutForm({ ...checkoutForm, durationDays: preset.days })}
-                      className={`py-2 px-2 rounded-xl text-xs font-medium border text-center transition ${
+                      className={`py-2 px-2 rounded-xl text-xs font-bold border text-center transition ${
                         checkoutForm.durationDays === preset.days
                           ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
-                          : 'bg-sand-50 dark:bg-sage-950 border-sand-300 dark:border-sage-700 text-slate-700 dark:text-slate-300 hover:bg-sand-100'
+                          : 'bg-white dark:bg-[#0c1815] border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 hover:bg-slate-100'
                       }`}
                     >
                       {preset.label}
@@ -465,23 +474,23 @@ export default function Borrowings() {
                 </div>
               </div>
 
-              <div className="p-3 rounded-xl bg-sand-100 dark:bg-sage-950/60 border border-sand-200 dark:border-sage-800 text-[11px] text-slate-600 dark:text-slate-400 space-y-1">
+              <div className="p-3 rounded-xl bg-slate-100 dark:bg-[#0c1815] border border-slate-200 dark:border-slate-700 text-[11px] text-slate-600 dark:text-slate-400 space-y-1 font-medium">
                 <p>• Jatuh tempo otomatis dihitung sejak tanggal check-out.</p>
                 <p>• Notifikasi pengingat via email dikirim H-1 sebelum jatuh tempo.</p>
               </div>
 
-              <div className="pt-4 border-t border-sand-200 dark:border-sage-800 flex justify-end gap-2">
+              <div className="pt-4 border-t border-slate-200 dark:border-slate-800 flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setShowFastCheckout(false)}
-                  className="px-4 py-2 rounded-xl border border-sand-300 dark:border-sage-700 text-slate-600 dark:text-slate-300 hover:bg-sand-100"
+                  className="px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 font-bold"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={submittingCheckout}
-                  className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold disabled:opacity-50 transition"
+                  className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold disabled:opacity-50 transition"
                 >
                   {submittingCheckout ? 'Memproses...' : 'Konfirmasi Check-out'}
                 </button>
@@ -494,53 +503,53 @@ export default function Borrowings() {
       {/* 1-Click Return & Fine Calculation Modal */}
       {returnModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
-          <div className="bg-white dark:bg-sage-900 rounded-2xl shadow-2xl border border-sand-200 dark:border-sage-800 w-full max-w-md p-6">
-            <div className="w-11 h-11 rounded-2xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto mb-3">
+          <div className="bg-white dark:bg-[#122420] rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-md p-6">
+            <div className="w-11 h-11 rounded-2xl bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 flex items-center justify-center mx-auto mb-3 font-bold">
               <RotateCcw className="w-6 h-6" />
             </div>
-            <h2 className="text-base font-bold text-slate-900 dark:text-white text-center">
+            <h2 className="text-base font-extrabold text-slate-900 dark:text-white text-center">
               Konfirmasi Pengembalian Koleksi
             </h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400 text-center mt-1">
+            <p className="text-xs text-slate-600 dark:text-slate-400 text-center mt-1">
               Validasi fisik barang & kalkulasi denda keterlambatan otomatis
             </p>
 
-            <div className="my-5 p-4 rounded-xl bg-sand-50 dark:bg-sage-950 border border-sand-200 dark:border-sage-800 text-xs space-y-2.5">
+            <div className="my-5 p-4 rounded-xl bg-slate-50 dark:bg-[#0c1815] border border-slate-200 dark:border-slate-700 text-xs space-y-2.5">
               <div className="flex justify-between">
-                <span className="text-slate-500">Judul Koleksi:</span>
-                <span className="font-semibold text-slate-800 dark:text-slate-200 text-right max-w-[200px] truncate">
+                <span className="text-slate-500 font-medium">Judul Koleksi:</span>
+                <span className="font-bold text-slate-900 dark:text-slate-100 text-right max-w-[200px] truncate">
                   {returnModal.borrowing.collection?.title}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Peminjam:</span>
-                <span className="font-medium text-slate-800 dark:text-slate-200">
+                <span className="text-slate-500 font-medium">Peminjam:</span>
+                <span className="font-bold text-slate-900 dark:text-slate-100">
                   {returnModal.borrowing.user?.name}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Jatuh Tempo:</span>
-                <span className="font-mono text-slate-700 dark:text-slate-300">
+                <span className="text-slate-500 font-medium">Jatuh Tempo:</span>
+                <span className="font-mono font-bold text-slate-800 dark:text-slate-200">
                   {formatDate(returnModal.borrowing.due_date)}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Tanggal Sekarang:</span>
-                <span className="font-mono text-slate-700 dark:text-slate-300">
+                <span className="text-slate-500 font-medium">Tanggal Sekarang:</span>
+                <span className="font-mono font-bold text-slate-800 dark:text-slate-200">
                   {formatDate(new Date())}
                 </span>
               </div>
 
-              <div className="pt-2 border-t border-sand-200 dark:border-sage-800 flex justify-between items-center">
-                <span className="font-semibold text-slate-700 dark:text-slate-300">Keterlambatan:</span>
-                <span className={`font-mono font-bold ${returnModal.daysLate > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
+              <div className="pt-2 border-t border-slate-200 dark:border-slate-700 flex justify-between items-center">
+                <span className="font-bold text-slate-800 dark:text-slate-200">Keterlambatan:</span>
+                <span className={`font-mono font-black ${returnModal.daysLate > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
                   {returnModal.daysLate > 0 ? `${returnModal.daysLate} Hari Terlambat` : 'Tepat Waktu (0 Hari)'}
                 </span>
               </div>
 
               <div className="flex justify-between items-center">
-                <span className="font-semibold text-slate-700 dark:text-slate-300">Total Denda:</span>
-                <span className="font-mono text-sm font-extrabold text-emerald-600 dark:text-emerald-400">
+                <span className="font-bold text-slate-800 dark:text-slate-200">Total Denda:</span>
+                <span className="font-mono text-base font-black text-emerald-600 dark:text-emerald-400">
                   {returnModal.calculatedFine > 0
                     ? `Rp ${returnModal.calculatedFine.toLocaleString('id-ID')}`
                     : 'Rp 0 (Bebas Denda)'}
@@ -552,7 +561,7 @@ export default function Borrowings() {
               <button
                 type="button"
                 onClick={() => setReturnModal(null)}
-                className="flex-1 py-2.5 rounded-xl border border-sand-300 dark:border-sage-700 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-sand-100"
+                className="flex-1 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100"
               >
                 Batal
               </button>
@@ -560,7 +569,7 @@ export default function Borrowings() {
                 type="button"
                 disabled={returnModal.submitting}
                 onClick={confirmReturn}
-                className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-xs font-semibold text-white shadow transition disabled:opacity-50"
+                className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-xs font-bold text-white shadow transition disabled:opacity-50"
               >
                 {returnModal.submitting ? 'Memproses...' : 'Konfirmasi Kembali'}
               </button>
@@ -572,45 +581,45 @@ export default function Borrowings() {
       {/* Transaction Detail Modal */}
       {showDetail && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
-          <div className="bg-white dark:bg-sage-900 rounded-2xl shadow-2xl border border-sand-200 dark:border-sage-800 w-full max-w-md p-6">
-            <h2 className="text-base font-bold text-slate-900 dark:text-white mb-4">
+          <div className="bg-white dark:bg-[#122420] rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-md p-6">
+            <h2 className="text-base font-extrabold text-slate-900 dark:text-white mb-4">
               Detail Transaksi Sirkulasi #{showDetail.id}
             </h2>
 
             <div className="space-y-3 text-xs">
-              <div className="p-3 rounded-xl bg-sand-50 dark:bg-sage-950 border border-sand-200 dark:border-sage-800 space-y-1.5">
-                <p className="font-semibold text-slate-900 dark:text-white text-sm">
+              <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-[#0c1815] border border-slate-200 dark:border-slate-700 space-y-1.5">
+                <p className="font-bold text-slate-900 dark:text-white text-sm">
                   {showDetail.collection?.title}
                 </p>
-                <p className="font-mono text-slate-400 text-[11px]">
+                <p className="font-mono text-slate-500 text-[11px] font-semibold">
                   Kode: {showDetail.collection?.code}
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 gap-2 text-slate-600 dark:text-slate-300">
-                <div className="p-2.5 rounded-lg bg-sand-50 dark:bg-sage-950">
-                  <span className="text-[10px] uppercase text-slate-400 block">Peminjam</span>
-                  <span className="font-semibold">{showDetail.user?.name}</span>
+              <div className="grid grid-cols-2 gap-2 text-slate-700 dark:text-slate-200">
+                <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-[#0c1815] border border-slate-200 dark:border-slate-700">
+                  <span className="text-[10px] uppercase text-slate-400 font-bold block">Peminjam</span>
+                  <span className="font-bold">{showDetail.user?.name}</span>
                 </div>
-                <div className="p-2.5 rounded-lg bg-sand-50 dark:bg-sage-950">
-                  <span className="text-[10px] uppercase text-slate-400 block">Status</span>
-                  <span className="font-semibold capitalize">{showDetail.status}</span>
+                <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-[#0c1815] border border-slate-200 dark:border-slate-700">
+                  <span className="text-[10px] uppercase text-slate-400 font-bold block">Status</span>
+                  <span className="font-bold capitalize">{showDetail.status}</span>
                 </div>
-                <div className="p-2.5 rounded-lg bg-sand-50 dark:bg-sage-950">
-                  <span className="text-[10px] uppercase text-slate-400 block">Tanggal Pinjam</span>
-                  <span className="font-mono">{formatDate(showDetail.borrowed_at)}</span>
+                <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-[#0c1815] border border-slate-200 dark:border-slate-700">
+                  <span className="text-[10px] uppercase text-slate-400 font-bold block">Tanggal Pinjam</span>
+                  <span className="font-mono font-semibold">{formatDate(showDetail.borrowed_at)}</span>
                 </div>
-                <div className="p-2.5 rounded-lg bg-sand-50 dark:bg-sage-950">
-                  <span className="text-[10px] uppercase text-slate-400 block">Jatuh Tempo</span>
-                  <span className="font-mono">{formatDate(showDetail.due_date)}</span>
+                <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-[#0c1815] border border-slate-200 dark:border-slate-700">
+                  <span className="text-[10px] uppercase text-slate-400 font-bold block">Jatuh Tempo</span>
+                  <span className="font-mono font-semibold">{formatDate(showDetail.due_date)}</span>
                 </div>
               </div>
             </div>
 
-            <div className="mt-5 pt-3 border-t border-sand-200 dark:border-sage-800 flex justify-end">
+            <div className="mt-5 pt-3 border-t border-slate-200 dark:border-slate-800 flex justify-end">
               <button
                 onClick={() => setShowDetail(null)}
-                className="px-4 py-2 rounded-xl bg-sand-100 dark:bg-sage-800 hover:bg-sand-200 text-xs font-semibold text-slate-700 dark:text-slate-200"
+                className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-xs font-bold text-slate-800 dark:text-slate-200"
               >
                 Tutup
               </button>

@@ -73,15 +73,15 @@ export default function Profile() {
           <User className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
           Pengaturan Akun & Profil
         </h1>
-        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+        <p className="text-xs text-slate-600 dark:text-slate-300 mt-1">
           Kelola informasi identitas, foto profil, dan peran akses sistem sirkulasi
         </p>
       </div>
 
-      <div className="bg-white dark:bg-sage-900 rounded-2xl shadow-sm border border-sand-200 dark:border-sage-800 p-6 sm:p-8">
+      <div className="bg-white dark:bg-[#122420] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 sm:p-8">
         <form onSubmit={handleSubmit} className="space-y-6 text-xs">
           {/* Avatar section */}
-          <div className="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-sand-200 dark:border-sage-800">
+          <div className="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-slate-200 dark:border-slate-800">
             <div className="relative w-24 h-24 rounded-2xl bg-sand-100 dark:bg-sage-800 border-2 border-emerald-500/50 shadow overflow-hidden shrink-0 flex items-center justify-center">
               {preview ? (
                 <img src={preview} alt="Profile" className="w-full h-full object-cover" />
@@ -119,7 +119,7 @@ export default function Profile() {
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
               required
-              className="w-full px-4 py-2.5 rounded-xl border border-sand-300 dark:border-sage-700 bg-sand-50/50 dark:bg-sage-950 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500 text-xs"
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-sand-50/50 dark:bg-sage-950 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500 text-xs"
             />
           </div>
 
@@ -133,11 +133,11 @@ export default function Profile() {
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
               required
-              className="w-full px-4 py-2.5 rounded-xl border border-sand-300 dark:border-sage-700 bg-sand-50/50 dark:bg-sage-950 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500 text-xs"
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-sand-50/50 dark:bg-sage-950 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500 text-xs"
             />
           </div>
 
-          <div className="pt-4 border-t border-sand-200 dark:border-sage-800 flex justify-end gap-2">
+          <div className="pt-4 border-t border-slate-200 dark:border-slate-800 flex justify-end gap-2">
             <button
               type="submit"
               disabled={submitting}

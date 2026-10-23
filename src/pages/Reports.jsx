@@ -167,13 +167,13 @@ export default function Reports() {
           <FileBarChart2 className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
           Laporan Analitik & Surat Bebas Pustaka
         </h1>
-        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+        <p className="text-xs text-slate-600 dark:text-slate-300 mt-1">
           Statistik sirkulasi buku, leaderboard member, audit log peminjaman, & penerbitan sertifikat yudisium
         </p>
       </div>
 
       {/* Tabs */}
-      <div className="flex flex-wrap gap-2 border-b border-sand-200 dark:border-sage-800 pb-2">
+      <div className="flex flex-wrap gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
         {tabs.map((t) => {
           const Icon = t.icon
           const active = tab === t.id
@@ -184,7 +184,7 @@ export default function Reports() {
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold transition ${
                 active
                   ? 'bg-emerald-600 text-white shadow-md'
-                  : 'bg-white dark:bg-sage-900 border border-sand-200 dark:border-sage-800 text-slate-600 dark:text-slate-300 hover:bg-sand-100 dark:hover:bg-sage-800'
+                  : 'bg-white dark:bg-[#122420] border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-sand-100 dark:hover:bg-sage-800'
               }`}
             >
               <Icon className="w-4 h-4" />
@@ -196,13 +196,13 @@ export default function Reports() {
 
       {/* TAB 1: Popular Collections */}
       {tab === 'popular' && (
-        <div className="bg-white dark:bg-sage-900 rounded-2xl border border-sand-200 dark:border-sage-800 shadow-sm overflow-hidden p-6">
+        <div className="bg-white dark:bg-[#122420] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden p-6">
           <div className="mb-5 flex justify-between items-center">
             <div>
               <h2 className="text-base font-bold text-slate-900 dark:text-white">
                 Koleksi Paling Sering Dipinjam
               </h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
                 Peringkat frekuensi peminjaman koleksi buku & aset fisik
               </p>
             </div>
@@ -219,7 +219,7 @@ export default function Reports() {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-sand-50 dark:bg-sage-950 text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold border-b border-sand-200 dark:border-sage-800">
+                <thead className="bg-slate-100 dark:bg-[#0c1815] text-slate-600 dark:text-slate-300 uppercase tracking-wider font-semibold border-b border-slate-200 dark:border-slate-800">
                   <tr>
                     <th className="py-3 px-4 w-12 text-center">Rank</th>
                     <th className="py-3 px-4">Judul Koleksi</th>
@@ -228,7 +228,7 @@ export default function Reports() {
                     <th className="py-3 px-4 text-right">Tingkat Minat</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-sand-100 dark:divide-sage-800/60">
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80">
                   {popularCollections.map((col, idx) => (
                     <tr key={col.id} className="hover:bg-sand-50/50 dark:hover:bg-sage-800/30 transition">
                       <td className="py-3.5 px-4 text-center font-mono font-bold">
@@ -249,7 +249,7 @@ export default function Reports() {
                       <td className="py-3.5 px-4 font-semibold text-slate-900 dark:text-white">
                         {col.title}
                       </td>
-                      <td className="py-3.5 px-4 font-mono text-slate-500 dark:text-slate-400">
+                      <td className="py-3.5 px-4 font-mono text-slate-600 dark:text-slate-300">
                         {col.code}
                       </td>
                       <td className="py-3.5 px-4 text-center font-mono font-bold text-emerald-600 dark:text-emerald-400">
@@ -274,13 +274,13 @@ export default function Reports() {
 
       {/* TAB 2: Active Members */}
       {tab === 'active' && (
-        <div className="bg-white dark:bg-sage-900 rounded-2xl border border-sand-200 dark:border-sage-800 shadow-sm overflow-hidden p-6">
+        <div className="bg-white dark:bg-[#122420] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden p-6">
           <div className="mb-5 flex justify-between items-center">
             <div>
               <h2 className="text-base font-bold text-slate-900 dark:text-white">
                 Leaderboard Member Paling Aktif
               </h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
                 Anggota dengan sirkulasi peminjaman buku & literatur tertinggi
               </p>
             </div>
@@ -297,7 +297,7 @@ export default function Reports() {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-sand-50 dark:bg-sage-950 text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold border-b border-sand-200 dark:border-sage-800">
+                <thead className="bg-slate-100 dark:bg-[#0c1815] text-slate-600 dark:text-slate-300 uppercase tracking-wider font-semibold border-b border-slate-200 dark:border-slate-800">
                   <tr>
                     <th className="py-3 px-4 w-12 text-center">Rank</th>
                     <th className="py-3 px-4">Nama Lengkap</th>
@@ -306,7 +306,7 @@ export default function Reports() {
                     <th className="py-3 px-4 text-right">Status Keanggotaan</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-sand-100 dark:divide-sage-800/60">
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80">
                   {activeMembers.map((m, idx) => (
                     <tr key={m.id} className="hover:bg-sand-50/50 dark:hover:bg-sage-800/30 transition">
                       <td className="py-3.5 px-4 text-center font-mono font-bold">
@@ -323,7 +323,7 @@ export default function Reports() {
                       <td className="py-3.5 px-4 font-semibold text-slate-900 dark:text-white">
                         {m.name}
                       </td>
-                      <td className="py-3.5 px-4 font-mono text-slate-500 dark:text-slate-400">
+                      <td className="py-3.5 px-4 font-mono text-slate-600 dark:text-slate-300">
                         {m.email}
                       </td>
                       <td className="py-3.5 px-4 text-center font-mono font-bold text-emerald-600 dark:text-emerald-400">
@@ -346,18 +346,18 @@ export default function Reports() {
 
       {/* TAB 3: Multi-Format Exporter */}
       {tab === 'export' && (
-        <div className="bg-white dark:bg-sage-900 rounded-2xl border border-sand-200 dark:border-sage-800 shadow-sm p-6 space-y-6">
+        <div className="bg-white dark:bg-[#122420] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 space-y-6">
           <div>
             <h2 className="text-base font-bold text-slate-900 dark:text-white">
               Audit Transaksi & Ekspor Multi-Format
             </h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
               Filter rentang tanggal dan unduh rekap sirkulasi dalam format PDF formal atau CSV Excel
             </p>
           </div>
 
           {/* Date range filter & export actions */}
-          <div className="p-4 rounded-xl bg-sand-50 dark:bg-sage-950 border border-sand-200 dark:border-sage-800 flex flex-wrap items-end gap-3 text-xs">
+          <div className="p-4 rounded-xl bg-slate-100 dark:bg-[#0c1815] border border-slate-200 dark:border-slate-800 flex flex-wrap items-end gap-3 text-xs">
             <div>
               <label className="block font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1">
                 Tanggal Awal
@@ -366,7 +366,7 @@ export default function Reports() {
                 type="date"
                 value={dateRange.start}
                 onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
-                className="px-3 py-2 rounded-xl border border-sand-300 dark:border-sage-700 bg-white dark:bg-sage-900 text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500"
+                className="px-3 py-2 rounded-xl border border-sand-300 dark:border-sage-700 bg-white dark:bg-[#122420] text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
 
@@ -378,7 +378,7 @@ export default function Reports() {
                 type="date"
                 value={dateRange.end}
                 onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
-                className="px-3 py-2 rounded-xl border border-sand-300 dark:border-sage-700 bg-white dark:bg-sage-900 text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500"
+                className="px-3 py-2 rounded-xl border border-sand-300 dark:border-sage-700 bg-white dark:bg-[#122420] text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
 
@@ -412,7 +412,7 @@ export default function Reports() {
           {/* Table Preview */}
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-sand-50 dark:bg-sage-950 text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold border-b border-sand-200 dark:border-sage-800">
+              <thead className="bg-slate-100 dark:bg-[#0c1815] text-slate-600 dark:text-slate-300 uppercase tracking-wider font-semibold border-b border-slate-200 dark:border-slate-800">
                 <tr>
                   <th className="py-3 px-4"># ID</th>
                   <th className="py-3 px-4">Nama Member</th>
@@ -423,7 +423,7 @@ export default function Reports() {
                   <th className="py-3 px-4 text-center">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-sand-100 dark:divide-sage-800/60">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80">
                 {exportData.length > 0 ? (
                   exportData.slice(0, 8).map((r) => (
                     <tr key={r.id} className="hover:bg-sand-50/50 dark:hover:bg-sage-800/30 transition">
@@ -455,14 +455,14 @@ export default function Reports() {
 
       {/* TAB 4: Surat Bebas Pustaka */}
       {tab === 'clearance' && (
-        <div className="bg-white dark:bg-sage-900 rounded-2xl border border-sand-200 dark:border-sage-800 shadow-sm p-6 space-y-6">
+        <div className="bg-white dark:bg-[#122420] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 space-y-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
               <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
                 <Award className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                 Penerbitan Surat Keterangan Bebas Perpustakaan
               </h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
                 Surat verifikasi yudisium resmi yang menyatakan mahasiswa/member bebas dari pinjaman buku & tunggakan kas
               </p>
             </div>
@@ -478,7 +478,7 @@ export default function Reports() {
 
           {/* Member Picker & Live Clearance Check */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            <div className="p-5 rounded-2xl bg-sand-50 dark:bg-sage-950 border border-sand-200 dark:border-sage-800 space-y-4 text-xs">
+            <div className="p-5 rounded-2xl bg-slate-100 dark:bg-[#0c1815] border border-slate-200 dark:border-slate-800 space-y-4 text-xs">
               <h3 className="font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider text-[11px]">
                 Identitas Pemohon Bebas Pustaka
               </h3>
@@ -499,7 +499,7 @@ export default function Reports() {
                       })
                     }
                   }}
-                  className="w-full px-3 py-2 rounded-xl border border-sand-300 dark:border-sage-700 bg-white dark:bg-sage-900 text-slate-800 dark:text-slate-200 outline-none"
+                  className="w-full px-3 py-2 rounded-xl border border-sand-300 dark:border-sage-700 bg-white dark:bg-[#122420] text-slate-800 dark:text-slate-200 outline-none"
                 >
                   {activeMembers.map(m => (
                     <option key={m.id} value={m.id}>{m.name} ({m.email})</option>
@@ -513,7 +513,7 @@ export default function Reports() {
                   type="text"
                   value={selectedMember.studentId}
                   onChange={(e) => setSelectedMember({ ...selectedMember, studentId: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl border border-sand-300 dark:border-sage-700 bg-white dark:bg-sage-900 text-slate-800 dark:text-slate-200 outline-none font-mono"
+                  className="w-full px-3 py-2 rounded-xl border border-sand-300 dark:border-sage-700 bg-white dark:bg-[#122420] text-slate-800 dark:text-slate-200 outline-none font-mono"
                 />
               </div>
 
@@ -523,16 +523,16 @@ export default function Reports() {
                   type="text"
                   value={selectedMember.department}
                   onChange={(e) => setSelectedMember({ ...selectedMember, department: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl border border-sand-300 dark:border-sage-700 bg-white dark:bg-sage-900 text-slate-800 dark:text-slate-200 outline-none"
+                  className="w-full px-3 py-2 rounded-xl border border-sand-300 dark:border-sage-700 bg-white dark:bg-[#122420] text-slate-800 dark:text-slate-200 outline-none"
                 />
               </div>
             </div>
 
             {/* Live Verification Clearance Status Card */}
-            <div className="md:col-span-2 p-5 rounded-2xl bg-white dark:bg-sage-900 border-2 border-emerald-500/40 shadow-sm flex flex-col justify-between">
+            <div className="md:col-span-2 p-5 rounded-2xl bg-white dark:bg-[#122420] border-2 border-emerald-500/40 shadow-sm flex flex-col justify-between">
               <div>
-                <div className="flex items-center justify-between pb-3 border-b border-sand-200 dark:border-sage-800">
-                  <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300">
                     Hasil Verifikasi Sirkulasi & Kas Terpusat
                   </span>
                   <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300 flex items-center gap-1">
@@ -542,7 +542,7 @@ export default function Reports() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 my-5 text-xs">
-                  <div className="p-3.5 rounded-xl bg-sand-50 dark:bg-sage-950 border border-sand-200 dark:border-sage-800">
+                  <div className="p-3.5 rounded-xl bg-slate-100 dark:bg-[#0c1815] border border-slate-200 dark:border-slate-800">
                     <span className="text-slate-400 block text-[11px]">Pinjaman Buku Aktif:</span>
                     <span className="text-base font-bold text-emerald-600 dark:text-emerald-400 font-mono">
                       0 Buku (Nihil)
@@ -550,7 +550,7 @@ export default function Reports() {
                     <p className="text-[10px] text-slate-400 mt-0.5">Semua koleksi telah kembali ke rak</p>
                   </div>
 
-                  <div className="p-3.5 rounded-xl bg-sand-50 dark:bg-sage-950 border border-sand-200 dark:border-sage-800">
+                  <div className="p-3.5 rounded-xl bg-slate-100 dark:bg-[#0c1815] border border-slate-200 dark:border-slate-800">
                     <span className="text-slate-400 block text-[11px]">Tunggakan Kas & Denda:</span>
                     <span className="text-base font-bold text-emerald-600 dark:text-emerald-400 font-mono">
                       Rp 0 (Lunas)
@@ -564,7 +564,7 @@ export default function Reports() {
                 </p>
               </div>
 
-              <div className="mt-5 pt-3 border-t border-sand-200 dark:border-sage-800 flex justify-end">
+              <div className="mt-5 pt-3 border-t border-slate-200 dark:border-slate-800 flex justify-end">
                 <button
                   onClick={() => setShowCertificateModal(true)}
                   className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow transition"
