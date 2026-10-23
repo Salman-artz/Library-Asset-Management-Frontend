@@ -91,16 +91,16 @@ export default function SidebarLayout({ children }) {
   const currentTitle = pageTitles[location.pathname] || 'Perpustakaan'
 
   return (
-    <div className="min-h-screen flex bg-slate-50 dark:bg-[#0B1715] text-slate-800 dark:text-slate-100 transition-colors duration-200 w-full">
+    <div className="h-screen w-full flex overflow-hidden bg-slate-50 dark:bg-[#0B1715] text-slate-800 dark:text-slate-100 transition-colors duration-200">
       {/* Sidebar */}
       <aside
         className={`${
           collapsed ? 'w-20' : 'w-64'
-        } shrink-0 bg-[#122D27] dark:bg-[#0A1A17] text-white flex flex-col justify-between transition-all duration-300 ease-in-out border-r border-[#1B3F37] shadow-xl z-30`}
+        } h-full shrink-0 bg-[#122D27] dark:bg-[#0A1A17] text-white flex flex-col justify-between transition-all duration-300 ease-in-out border-r border-[#1B3F37] shadow-xl z-30 overflow-hidden select-none`}
       >
-        <div>
+        <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
           {/* Brand Header */}
-          <div className="h-16 px-4 flex items-center justify-between border-b border-[#1E453C]">
+          <div className="h-16 px-4 flex items-center justify-between border-b border-[#1E453C] shrink-0">
             <Link to="/dashboard" className="flex items-center space-x-3 overflow-hidden">
               {/* Logo container - ready for custom image logo */}
               <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-md">
@@ -127,7 +127,7 @@ export default function SidebarLayout({ children }) {
           </div>
 
           {/* Navigation Links */}
-          <nav className="p-3 space-y-1.5 mt-2">
+          <nav className="p-3 space-y-1.5 mt-2 flex-1 overflow-y-auto">
             {visibleNav.map((item) => {
               const Icon = item.icon
               const active = location.pathname === item.to
@@ -157,7 +157,7 @@ export default function SidebarLayout({ children }) {
         </div>
 
         {/* Sidebar Footer: Profile & Utilities */}
-        <div className="p-3 border-t border-[#1E453C] bg-[#0E241F]">
+        <div className="p-3 border-t border-[#1E453C] bg-[#0E241F] shrink-0">
           {user ? (
             <div className="flex flex-col space-y-2">
               <Link
@@ -215,9 +215,9 @@ export default function SidebarLayout({ children }) {
       </aside>
 
       {/* Main Content Area - Fully Fluid & Responsive Fullscreen */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-y-auto w-full">
+      <div className="flex-1 flex flex-col min-w-0 h-full overflow-y-auto w-full">
         {/* Top Header Bar - Clean without capsule slop */}
-        <header className="h-16 bg-white dark:bg-[#10221E] border-b border-slate-200 dark:border-slate-800 px-4 sm:px-6 lg:px-8 flex items-center justify-between sticky top-0 z-20 shadow-sm transition-colors w-full">
+        <header className="h-16 shrink-0 bg-white dark:bg-[#10221E] border-b border-slate-200 dark:border-slate-800 px-4 sm:px-6 lg:px-8 flex items-center justify-between sticky top-0 z-20 shadow-sm transition-colors w-full">
           {/* Breadcrumb / Title */}
           <div className="flex items-center space-x-2.5">
             <span className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
