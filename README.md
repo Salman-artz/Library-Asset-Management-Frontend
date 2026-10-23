@@ -29,7 +29,48 @@ Modern, responsive web frontend untuk sistem informasi sirkulasi perpustakaan in
 
 ---
 
-## ✨ Fitur Unggulan
+## 🏛️ Clean Architecture & Pemisahan Lapisan (Frontend)
+
+Frontend menerapkan prinsip **Clean Architecture & Separation of Concerns** untuk memisahkan UI presentation dari data fetching, komunikasi HTTP, dan state management:
+
+```
+┌────────────────────────────────────────────────────────┐
+│  Presentation Layer (UI Views & Layouts)               │
+│  Pages, Modals, Shared Layout, Badges                  │
+│  (src/pages, src/components)                           │
+└───────────────────────────┬────────────────────────────┘
+                            │ (Calls Hooks & Services)
+                            ▼
+┌────────────────────────────────────────────────────────┐
+│  Application & Context Layer (State Management)        │
+│  AuthContext, ThemeContext, Route Guards               │
+│  (src/context, src/components/ProtectedRoute)          │
+└───────────────────────────┬────────────────────────────┘
+                            │ (Calls Domain Services)
+                            ▼
+┌────────────────────────────────────────────────────────┐
+│  Domain Service Layer (Modular Domain API Clients)     │
+│  authService, collectionService, borrowingService,     │
+│  fineService, categoryService, reportService           │
+│  (src/services/*.service.js, src/services/index.js)    │
+└───────────────────────────┬────────────────────────────┘
+                            │ (Uses Axios Client)
+                            ▼
+┌────────────────────────────────────────────────────────┐
+│  Infrastructure Layer (Network & Storage Client)       │
+│  Axios Instance, Bearer Token Interceptor, LocalStorage│
+│  (src/services/api.js)                                 │
+└────────────────────────────────────────────────────────┘
+```
+
+### Struktur Direktori Frontend:
+- **`src/pages/`**: Komponen halaman utama (`Dashboard`, `Collections`, `Borrowings`, `Fines`, `Reports`, `Categories`, `Login`, `Profile`). Setiap halaman hanya fokus pada penyajian UI dan berinteraksi secara murni melalui domain service.
+- **`src/components/`**: Komponen UI reusable (`SidebarLayout`, `ProtectedRoute`).
+- **`src/context/`**: State context global (`AuthContext`, `ThemeContext`).
+- **`src/services/`**: Modul domain service terisolasi (`auth.service.js`, `collection.service.js`, `borrowing.service.js`, `fine.service.js`, `category.service.js`, `report.service.js`) dengan barrel export di `index.js`.
+- **`src/assets/`**: Asset biner resmi (logo, ikon, favicon) yang dibundel langsung via Vite ES module.
+
+---
 
 1. **Branding Pustaka Sentral**: Identitas sistem perpustakaan modern yang otentik, elegan, dan profesional.
 2. **Fixed Sidebar Layout**: Sidebar navigasi terkunci penuh pada 100% viewport (`h-screen overflow-hidden`) tanpa perlu scroll ganda. Profil pengguna, Dark Mode switcher, dan tombol Logout selalu terlihat dan dapat diakses instan.
