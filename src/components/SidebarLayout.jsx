@@ -102,11 +102,11 @@ export default function SidebarLayout({ children }) {
           {/* Brand Header */}
           <div className="h-16 px-4 flex items-center justify-between border-b border-[#1E453C] shrink-0">
             <Link to="/dashboard" className="flex items-center space-x-3 overflow-hidden">
-              {/* Official Pustaka Sentral Logo */}
+              {/* Official Pustaka Sentral Emblem (Transparent PNG) */}
               <img
-                src="/logo.png"
+                src="/logo-icon.png"
                 alt="Pustaka Sentral"
-                className="w-10 h-10 rounded-xl object-contain bg-white p-0.5 shadow-md shrink-0 border border-emerald-400/30"
+                className="w-10 h-10 object-contain shrink-0 filter drop-shadow-md"
               />
               {!collapsed && (
                 <div className="flex flex-col truncate">

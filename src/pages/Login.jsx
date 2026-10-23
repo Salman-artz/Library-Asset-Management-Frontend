@@ -43,9 +43,9 @@ export default function Login() {
       <div className="p-6 flex items-center justify-between max-w-7xl mx-auto w-full">
         <div className="flex items-center space-x-3">
           <img
-            src="/logo.png"
+            src="/logo-icon.png"
             alt="Pustaka Sentral"
-            className="w-11 h-11 rounded-xl object-contain bg-white p-0.5 shadow-md border border-slate-200 dark:border-slate-700 shrink-0"
+            className="w-11 h-11 object-contain shrink-0 filter drop-shadow-sm"
           />
           <div>
             <span className="font-extrabold text-base tracking-wide uppercase text-slate-900 dark:text-white font-sans">
@@ -71,9 +71,9 @@ export default function Login() {
         <div className="bg-white dark:bg-[#122420] rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 p-8 transition">
           <div className="text-center mb-7">
             <img
-              src="/logo.png"
+              src="/logo-icon.png"
               alt="Pustaka Sentral Emblem"
-              className="w-20 h-20 mx-auto rounded-2xl object-contain bg-white p-1.5 shadow-md border border-slate-200 dark:border-slate-700 mb-4"
+              className="w-20 h-20 mx-auto object-contain filter drop-shadow-md mb-3"
             />
             <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
               Masuk ke Perpustakaan

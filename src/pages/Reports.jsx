@@ -602,7 +602,7 @@ export default function Reports() {
             <div id="printable-certificate" className="space-y-6 pt-4">
               {/* Kop Surat Resmi */}
               <div className="border-b-2 border-slate-900 pb-4 flex items-center justify-between gap-4 text-center sm:text-left">
-                <img src="/logo.png" alt="Logo Pustaka Sentral" className="w-16 h-16 object-contain hidden sm:block shrink-0" />
+                <img src="/logo-icon.png" alt="Logo Pustaka Sentral" className="w-16 h-16 object-contain hidden sm:block shrink-0" />
                 <div className="flex-1 text-center">
                   <div className="text-xs uppercase tracking-widest font-bold text-emerald-800">
                     KEMENTERIAN PENDIDIKAN, KEBUDAYAAN, RISET, DAN TEKNOLOGI
