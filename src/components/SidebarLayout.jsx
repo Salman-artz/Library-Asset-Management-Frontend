@@ -14,12 +14,8 @@ import {
   Sun,
   Moon,
   LogOut,
-  Shield,
-  Layers,
-  Sparkles,
   Barcode,
-  User,
-  Bell
+  Library
 } from 'lucide-react'
 
 export default function SidebarLayout({ children }) {
@@ -30,13 +26,13 @@ export default function SidebarLayout({ children }) {
   const [collapsed, setCollapsed] = useState(false)
 
   const handleLogout = () => {
-    if (window.confirm('Keluar dari sesi Library & Asset System?')) {
+    if (window.confirm('Keluar dari sesi sistem perpustakaan?')) {
       logout()
       navigate('/login')
     }
   }
 
-  // Navigation config with strict role separation
+  // Navigation config
   const navItems = [
     {
       to: '/dashboard',
@@ -46,13 +42,13 @@ export default function SidebarLayout({ children }) {
     },
     {
       to: '/collections',
-      label: 'Katalog & Aset',
+      label: 'Katalog Koleksi',
       icon: BookOpen,
       roles: ['all'],
     },
     {
       to: '/borrowings',
-      label: user?.role === 'member' ? 'Peminjaman Saya' : 'Sirkulasi & Pinjam',
+      label: user?.role === 'member' ? 'Peminjaman Saya' : 'Sirkulasi Peminjaman',
       icon: ArrowLeftRight,
       roles: ['admin', 'staff', 'member'],
     },
@@ -64,15 +60,15 @@ export default function SidebarLayout({ children }) {
     },
     {
       to: '/categories',
-      label: 'Kategori Koleksi',
+      label: 'Kategori Buku',
       icon: Tags,
-      roles: ['admin', 'staff'], // Hidden from member!
+      roles: ['admin', 'staff'],
     },
     {
       to: '/reports',
-      label: 'Laporan & Audit',
+      label: 'Laporan & Bebas Pustaka',
       icon: FileBarChart2,
-      roles: ['admin', 'staff'], // Hidden from member!
+      roles: ['admin', 'staff'],
     },
   ]
 
@@ -82,22 +78,21 @@ export default function SidebarLayout({ children }) {
     return item.roles.some((r) => hasRole(r))
   })
 
-  // Page title mapping for header breadcrumb
   const pageTitles = {
-    '/dashboard': 'Dashboard Sirkulasi',
-    '/collections': 'Katalog Koleksi & Aset Fisik',
-    '/borrowings': user?.role === 'member' ? 'Riwayat Peminjaman Saya' : 'Sirkulasi Peminjaman',
-    '/fines': user?.role === 'member' ? 'Catatan Denda Saya' : 'Manajemen Kas & Denda',
+    '/dashboard': 'Dashboard Perpustakaan',
+    '/collections': 'Katalog Koleksi & Literatur',
+    '/borrowings': user?.role === 'member' ? 'Riwayat Peminjaman Buku Saya' : 'Sirkulasi Peminjaman',
+    '/fines': user?.role === 'member' ? 'Catatan Denda Keterlambatan' : 'Kas & Denda Keterlambatan',
     '/categories': 'Kategori Koleksi',
-    '/reports': 'Laporan Analitik & Bebas Pustaka',
-    '/profile': 'Pengaturan Profil Akun',
+    '/reports': 'Laporan Analitik & Surat Bebas Pustaka',
+    '/profile': 'Profil Pengguna',
   }
 
-  const currentTitle = pageTitles[location.pathname] || 'Perpustakaan & Aset'
+  const currentTitle = pageTitles[location.pathname] || 'Perpustakaan'
 
   return (
-    <div className="min-h-screen flex bg-slate-50 dark:bg-[#0B1715] text-slate-800 dark:text-slate-100 transition-colors duration-200">
-      {/* Sidebar - High Contrast Deep Forest Pine */}
+    <div className="min-h-screen flex bg-slate-50 dark:bg-[#0B1715] text-slate-800 dark:text-slate-100 transition-colors duration-200 w-full">
+      {/* Sidebar */}
       <aside
         className={`${
           collapsed ? 'w-20' : 'w-64'
@@ -107,16 +102,17 @@ export default function SidebarLayout({ children }) {
           {/* Brand Header */}
           <div className="h-16 px-4 flex items-center justify-between border-b border-[#1E453C]">
             <Link to="/dashboard" className="flex items-center space-x-3 overflow-hidden">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-md">
-                <Layers className="w-5 h-5" />
+              {/* Logo container - ready for custom image logo */}
+              <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-md">
+                <Library className="w-5 h-5" />
               </div>
               {!collapsed && (
                 <div className="flex flex-col truncate">
-                  <span className="font-extrabold text-sm tracking-wider uppercase text-white font-mono">
-                    ARCHIVE & ASSET
+                  <span className="font-extrabold text-sm tracking-wide uppercase text-white font-sans">
+                    PUSTAKA SENTRAL
                   </span>
-                  <span className="text-[11px] font-semibold text-emerald-300 truncate">
-                    Circulation Engine
+                  <span className="text-[11px] font-medium text-emerald-300 truncate">
+                    Sistem Perpustakaan
                   </span>
                 </div>
               )}
@@ -130,7 +126,7 @@ export default function SidebarLayout({ children }) {
             </button>
           </div>
 
-          {/* Navigation Links - Solid High Contrast */}
+          {/* Navigation Links */}
           <nav className="p-3 space-y-1.5 mt-2">
             {visibleNav.map((item) => {
               const Icon = item.icon
@@ -218,23 +214,18 @@ export default function SidebarLayout({ children }) {
         </div>
       </aside>
 
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
-        {/* Top Header Bar - Crisp White / Dark Navy with Clear Breadcrumbs & User Badge */}
-        <header className="h-16 bg-white dark:bg-[#10221E] border-b border-slate-200 dark:border-slate-800 px-6 flex items-center justify-between sticky top-0 z-20 shadow-sm transition-colors">
+      {/* Main Content Area - Fully Fluid & Responsive Fullscreen */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-y-auto w-full">
+        {/* Top Header Bar - Clean without capsule slop */}
+        <header className="h-16 bg-white dark:bg-[#10221E] border-b border-slate-200 dark:border-slate-800 px-4 sm:px-6 lg:px-8 flex items-center justify-between sticky top-0 z-20 shadow-sm transition-colors w-full">
           {/* Breadcrumb / Title */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-2.5">
             <span className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-              Sistem
+              Perpustakaan
             </span>
             <span className="text-slate-300 dark:text-slate-600 font-mono">/</span>
             <span className="text-sm font-bold text-slate-900 dark:text-white">
               {currentTitle}
-            </span>
-
-            <span className="hidden md:inline-flex items-center gap-1.5 ml-2 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              Online
             </span>
           </div>
 
@@ -242,7 +233,7 @@ export default function SidebarLayout({ children }) {
           <div className="flex items-center space-x-3">
             <Link
               to="/collections"
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:hover:bg-emerald-900/80 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 transition shadow-sm"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 transition shadow-sm"
             >
               <Barcode className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
               <span>Scan ISBN</span>
@@ -269,8 +260,8 @@ export default function SidebarLayout({ children }) {
           </div>
         </header>
 
-        {/* Page Content */}
-        <main className="flex-1 p-6 sm:p-8 max-w-7xl w-full mx-auto">
+        {/* Page Content - Full screen fluid width */}
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 w-full">
           {children}
         </main>
       </div>

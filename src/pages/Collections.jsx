@@ -731,7 +731,7 @@ export default function Collections() {
 
             <div className="my-5 p-4 bg-white border-2 border-dashed border-slate-400 rounded-xl text-black">
               <div className="text-[11px] font-bold uppercase tracking-wider text-slate-900">
-                ARCHIVE & ASSET SYSTEM
+                PUSTAKA SENTRAL
               </div>
               <div className="text-xs font-bold mt-1 truncate text-slate-900">
                 {barcodeModalItem.title}
