@@ -1,154 +1,70 @@
-# Library & Asset Management Frontend
+# ARCHIVE & ASSET — Enterprise Library & Asset Circulation System (Frontend)
 
-Frontend web untuk sistem manajemen perpustakaan dan aset institusi. Aplikasi ini digunakan oleh Admin, Staff, dan Member untuk mengelola katalog koleksi, peminjaman, pengembalian, denda, dan laporan.
-
-Project dibangun menggunakan React, Vite, Tailwind CSS, dan React Router.
+Modern, quiet-luxury web frontend untuk sistem sirkulasi terpadu perpustakaan dan manajemen aset fisik institusional. Dibangun dengan tema **Sage Forest & Warm Sand**, tata letak **Collapsible Enterprise Sidebar**, dukungan **Dark Mode**, pemindaian **Barcode/ISBN**, sirkulasi **Fast Check-in/Check-out** dengan kalkulator denda otomatis presisi, serta penerbitan **Surat Keterangan Bebas Perpustakaan** resmi.
 
 ---
 
-## 📸 Screenshots & Antarmuka Sistem
+## 📸 Antarmuka Sistem & Portfolio Gallery
 
 <p align="center">
-  <img src="public/screenshots/foto1_katalog_buku_pencarian.png" alt="Katalog Koleksi Buku & Pencarian" width="95%" />
+  <img src="public/screenshots/02_dashboard_light.png" alt="Enterprise Dashboard - Light Mode" width="95%" />
   <br/>
-  <em>Katalog Buku & Koleksi Perpustakaan dengan Filter Kategori & Ketersediaan</em>
+  <em>Enterprise Circulation Dashboard — Sage Forest & Warm Sand Palette</em>
 </p>
 
 <details open>
-<summary><strong>Lihat Galeri Fitur Utama Lainnya ▾</strong></summary>
+<summary><strong>Lihat Dokumentasi Fitur Utama ▾</strong></summary>
 
-| Modul | Preview Antarmuka |
+| Fitur / Modul | Preview Antarmuka |
 |---|---|
-| **Sirkulasi Peminjaman & Denda**<br/>Tabel peminjaman aktif, batas jatuh tempo, status kembali, dan denda keterlambatan otomatis. | <img src="public/screenshots/foto2_sirkulasi_peminjaman_denda.png" alt="Sirkulasi Peminjaman" width="460" /> |
-| **Tracking Aset Fisik Organisasi**<br/>Inventarisasi perangkat lab & server dengan kode barcode, kondisi barang, dan lokasi ruangan. | <img src="public/screenshots/foto3_tracking_aset_fisik.png" alt="Tracking Aset Fisik" width="460" /> |
-| **Laporan Statistik & Dashboard Admin**<br/>Ringkasan buku terpopuler, anggota paling aktif, dan modul ekspor data laporan. | <img src="public/screenshots/foto4_dashboard_ringkasan_admin.png" alt="Laporan Admin" width="460" /> |
+| **Dark Mode & Institutional Sidebar**<br/>Navigasi collapsible dengan kontrol tema real-time dan audit sirkulasi aktif. | <img src="public/screenshots/03_dashboard_dark.png" alt="Dark Mode Dashboard" width="460" /> |
+| **Katalog & Filter Barcode ISBN**<br/>Pencarian instan kode ISBN/barcode, filter literatur vs perangkat TI, dan stok meter. | <img src="public/screenshots/04_collections_catalog.png" alt="Katalog Koleksi & Aset" width="460" /> |
+| **Pencarian Kilat & Tes Scan ISBN**<br/>Deteksi cepat barcode buku dengan modal cetak label stiker inventaris. | <img src="public/screenshots/05_collections_isbn_search.png" alt="Pencarian ISBN" width="460" /> |
+| **Label Barcode Inventaris Siap Cetak**<br/>Modal stiker barcode thermal standar UPT Perpustakaan. | <img src="public/screenshots/06_barcode_tag_modal.png" alt="Barcode Tag" width="460" /> |
+| **Sirkulasi & Fast Check-out**<br/>Peminjaman kilat terintegrasi dengan durasi adaptif (7/14/30 hari). | <img src="public/screenshots/08_fast_checkout_modal.png" alt="Fast Checkout" width="460" /> |
+| **1-Click Return & Kalkulator Denda**<br/>Perhitungan otomatis keterlambatan harian (Rp 3.000/hari) saat barang dikembalikan. | <img src="public/screenshots/09_return_fine_calculator_modal.png" alt="Fine Calculator" width="460" /> |
+| **Penerbitan Surat Bebas Pustaka Resmi**<br/>Verifikasi otomatis tanggungan pinjaman & kas denda untuk syarat yudisium/wisuda. | <img src="public/screenshots/11_clearance_verification.png" alt="Verifikasi Bebas Pustaka" width="460" /> |
+| **Format Sertifikat Bebas Pustaka Cetak**<br/>Layout kop surat resmi dengan validasi digital QR code & tanda tangan kepala pustakawan. | <img src="public/screenshots/12_surat_bebas_pustaka_official.png" alt="Surat Bebas Pustaka" width="460" /> |
+| **Manajemen Kas & Denda Keterlambatan**<br/>Monitoring kas masuk, audit denda per member, dan verifikasi status lunas. | <img src="public/screenshots/13_fines_kas_management.png" alt="Kas Denda" width="460" /> |
 
 </details>
 
 ---
 
-## Fitur
+## ✨ Fitur Unggulan
 
-- Login dan register pengguna
-- Role-based navigation untuk Admin, Staff, dan Member
-- Dashboard ringkasan aktivitas perpustakaan
-- Katalog koleksi dengan pencarian dan filter
-- Manajemen kategori dan koleksi
-- Peminjaman dan pengembalian koleksi
-- Monitoring denda dan pembayaran
-- Laporan koleksi populer dan anggota aktif
-- Notifikasi aksi menggunakan React Hot Toast
-- Protected route untuk halaman yang membutuhkan autentikasi
+1. **Sage Forest & Warm Sand Design System**: Palet warna Deep Forest Sage (`#1B3B36`), Emerald Mint (`#10B981`), dan Alabaster Sand (`#FAF9F6`) dengan typography Plus Jakarta Sans.
+2. **Collapsible Enterprise Sidebar & Dark Mode**: Sidebar modern dengan status sistem real-time, profile badge, dan switch tema instan yang tersimpan di localStorage.
+3. **Pencarian Barcode & ISBN Real-time**: Quick filters untuk membedakan buku literatur vs aset fisik hardware institusi.
+4. **Fast Check-in / Check-out**: Peminjaman kilat tanpa reload dengan pemilihan durasi pinjaman standar.
+5. **Kalkulator Denda Keterlambatan Otomatis**: Dialog konfirmasi pengembalian yang menghitung jumlah hari terlambat dan nominal denda secara presisi sebelum status diubah.
+6. **Ekspor Multi-Format & Surat Bebas Pustaka**: Laporan dalam bentuk PDF & CSV Excel, serta modal cetak Surat Bebas Perpustakaan siap cetak via browser.
 
-## Tech Stack
+---
 
-| Area | Teknologi |
-| --- | --- |
-| UI | React 18 |
-| Build tool | Vite 5 |
-| Styling | Tailwind CSS 3 |
-| Routing | React Router DOM 6 |
-| HTTP client | Axios |
-| Authentication state | React Context |
-| Notifications | React Hot Toast |
+## 🛠️ Tech Stack
 
-## Prasyarat
+| Komponen | Spesifikasi |
+|---|---|
+| **Framework** | React 18.3 |
+| **Build Tool** | Vite 5.4 |
+| **Styling** | Tailwind CSS 3.4 (Custom Theme & Dark Mode) |
+| **Icons** | Lucide React |
+| **Routing** | React Router DOM 6.26 |
+| **HTTP Client** | Axios 1.7 |
+| **Notifications** | React Hot Toast |
 
-- Node.js 18 atau lebih baru
-- npm
-- Library Asset Management API berjalan
+---
 
-## Instalasi
+## 🚀 Menjalankan Project
 
 ```bash
-git clone git@github.com:Salman-artz/Library-Asset-Management-Frontend.git
-cd library-aset-frontend
+# Install dependencies
 npm install
-copy .env.example .env
-```
 
-Atur alamat API pada file `.env`:
-
-```env
-VITE_API_BASE_URL=http://localhost/library-aset-manajemen/public/api
-```
-
-Sesuaikan URL tersebut jika backend dijalankan menggunakan `php artisan serve` atau host yang berbeda.
-
-## Menjalankan Project
-
-Development server:
-
-```bash
+# Jalankan dev server
 npm run dev
-```
 
-Aplikasi tersedia di `http://localhost:5173`.
-
-Build dan preview production:
-
-```bash
+# Build untuk produksi
 npm run build
-npm run preview
 ```
-
-## Integrasi Backend
-
-Frontend menggunakan Axios untuk mengakses endpoint backend dan menyimpan token autentikasi untuk request protected. Backend API menggunakan prefix `/api`.
-
-Pastikan backend Laravel sudah aktif:
-
-```bash
-cd ../library-aset-manajemen
-php artisan serve
-```
-
-Jika memakai Sanctum bearer token, request protected dikirim dengan header:
-
-```text
-Authorization: Bearer <token>
-```
-
-## Halaman Utama
-
-| Area | Route |
-| --- | --- |
-| Login | `/login` |
-| Register | `/register` |
-| Dashboard | `/dashboard` |
-| Koleksi | `/collections` |
-| Kategori | `/categories` |
-| Peminjaman | `/borrowings` |
-| Denda | `/fines` |
-| Laporan | `/reports` |
-
-## Struktur Project
-
-```text
-src/
-  components/        Komponen reusable dan protected route
-  context/           AuthContext dan state autentikasi
-  pages/             Halaman login, dashboard, koleksi, dan laporan
-  services/          Service Axios untuk komunikasi API
-  App.jsx            Routing utama aplikasi
-  main.jsx           Entry point React
-  index.css          Import Tailwind CSS
-public/              Asset publik
-```
-
-## Akun Demo
-
-| Role | Email | Password |
-| --- | --- | --- |
-| Admin | `admin@library.test` | `password` |
-| Staff | `staff1@library.test` | `password` |
-| Member | `member1@library.test` | `password` |
-
-## Repository Terkait
-
-- Frontend: https://github.com/Salman-artz/Library-Asset-Management-Frontend
-- Backend: https://github.com/Salman-artz/library-asset-management-api
-
-## License
-
-MIT

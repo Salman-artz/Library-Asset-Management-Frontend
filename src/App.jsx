@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
-import Navbar from './components/Navbar'
+import SidebarLayout from './components/SidebarLayout'
 import ProtectedRoute from './components/ProtectedRoute'
 import Login from './pages/Login'
 import Register from './pages/Register'
@@ -13,36 +13,95 @@ import Reports from './pages/Reports'
 import Profile from './pages/Profile'
 
 export default function App() {
-  const { isAuthenticated } = useAuth()
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar />
-      <Routes>
-        {/* Public routes */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/collections" element={<Collections />} />
+    <Routes>
+      {/* Public standalone auth routes */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
 
-        {/* Protected routes (any authenticated user) */}
-        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-        <Route path="/borrowings" element={<ProtectedRoute><Borrowings /></ProtectedRoute>} />
-        <Route path="/fines" element={<ProtectedRoute><Fines /></ProtectedRoute>} />
+      {/* Pages rendered within SidebarLayout */}
+      <Route
+        path="/collections"
+        element={
+          <SidebarLayout>
+            <Collections />
+          </SidebarLayout>
+        }
+      />
+      <Route
+        path="/dashboard"
+        element={
+          <SidebarLayout>
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          </SidebarLayout>
+        }
+      />
+      <Route
+        path="/profile"
+        element={
+          <SidebarLayout>
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          </SidebarLayout>
+        }
+      />
+      <Route
+        path="/borrowings"
+        element={
+          <SidebarLayout>
+            <ProtectedRoute>
+              <Borrowings />
+            </ProtectedRoute>
+          </SidebarLayout>
+        }
+      />
+      <Route
+        path="/fines"
+        element={
+          <SidebarLayout>
+            <ProtectedRoute>
+              <Fines />
+            </ProtectedRoute>
+          </SidebarLayout>
+        }
+      />
+      <Route
+        path="/categories"
+        element={
+          <SidebarLayout>
+            <ProtectedRoute roles={['admin', 'staff']}>
+              <Categories />
+            </ProtectedRoute>
+          </SidebarLayout>
+        }
+      />
+      <Route
+        path="/reports"
+        element={
+          <SidebarLayout>
+            <ProtectedRoute roles={['admin', 'staff']}>
+              <Reports />
+            </ProtectedRoute>
+          </SidebarLayout>
+        }
+      />
 
-        {/* Protected routes (admin/staff only) */}
-        <Route path="/categories" element={<ProtectedRoute roles={['admin', 'staff']}><Categories /></ProtectedRoute>} />
-        <Route path="/reports" element={<ProtectedRoute roles={['admin', 'staff']}><Reports /></ProtectedRoute>} />
-
-        {/* Default & 404 */}
-        <Route path="/" element={<Navigate to="/dashboard" />} />
-        <Route path="*" element={
-          <div className="flex flex-col items-center justify-center min-h-[60vh]">
-            <h1 className="text-4xl font-bold text-gray-400">404</h1>
-            <p className="text-gray-500 mt-2">Halaman tidak ditemukan</p>
-          </div>
-        } />
-      </Routes>
-    </div>
+      {/* Defaults */}
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route
+        path="*"
+        element={
+          <SidebarLayout>
+            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
+              <h1 className="text-6xl font-extrabold text-emerald-600 font-mono">404</h1>
+              <p className="text-slate-600 dark:text-slate-400 mt-2 text-lg">Halaman tidak ditemukan</p>
+            </div>
+          </SidebarLayout>
+        }
+      />
+    </Routes>
   )
 }

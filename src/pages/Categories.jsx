@@ -2,6 +2,15 @@ import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 import api from '../services/api'
 import { useAuth } from '../context/AuthContext'
+import {
+  Tags,
+  Plus,
+  Search,
+  Edit2,
+  Trash2,
+  FolderOpen,
+  Layers
+} from 'lucide-react'
 
 export default function Categories() {
   const { hasRole } = useAuth()
@@ -75,7 +84,7 @@ export default function Categories() {
   }
 
   const handleDelete = async (id) => {
-    if (!confirm('Yakin ingin menghapus kategori ini?')) return
+    if (!confirm('Hapus kategori ini? Pastikan tidak ada koleksi yang bergantung.')) return
     try {
       await api.delete(`/categories/${id}`)
       toast.success('Kategori berhasil dihapus')
@@ -86,125 +95,134 @@ export default function Categories() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+    <div className="space-y-6 animate-fade-in max-w-5xl">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Manajemen Kategori</h1>
-          <p className="text-sm text-gray-500 mt-1">Total {categories.length} kategori</p>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2.5">
+            <Tags className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+            Manajemen Kategori Koleksi & Aset
+          </h1>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            Total {categories.length} kategori pengelompokan buku dan aset fisik perpustakaan
+          </p>
         </div>
+
         {hasRole('admin', 'staff') && (
           <button
             onClick={openCreateModal}
-            className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition flex items-center space-x-1"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-md transition transform hover:-translate-y-0.5"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            <span>Tambah Kategori</span>
+            <Plus className="w-4 h-4" />
+            Tambah Kategori Baru
           </button>
         )}
       </div>
 
-      {/* Search */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
+      {/* Search Input */}
+      <div className="relative">
+        <Search className="w-4 h-4 absolute left-3.5 top-3 text-slate-400" />
         <input
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Cari kategori..."
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+          placeholder="Cari nama kategori..."
+          className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-sand-300 dark:border-sage-700 bg-white dark:bg-sage-900 text-slate-900 dark:text-white text-xs outline-none focus:ring-2 focus:ring-emerald-500 transition shadow-sm"
         />
       </div>
 
+      {/* Categories Grid */}
       {loading ? (
-        <div className="flex justify-center py-12">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div>
+        <div className="py-20 text-center text-slate-400">
+          <div className="w-8 h-8 mx-auto border-2 border-emerald-600 border-t-transparent rounded-full animate-spin mb-2" />
+          <p className="text-xs">Memuat daftar kategori...</p>
+        </div>
+      ) : categories.length === 0 ? (
+        <div className="py-16 text-center text-slate-400 bg-white dark:bg-sage-900 rounded-2xl border border-sand-200 dark:border-sage-800 p-6">
+          <FolderOpen className="w-12 h-12 mx-auto text-slate-300 dark:text-slate-600 mb-3" />
+          <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">Tidak ada kategori ditemukan</p>
         </div>
       ) : (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-          {categories.length === 0 ? (
-            <div className="text-center py-12 text-gray-400">Belum ada kategori</div>
-          ) : (
-            <table className="w-full">
-              <thead>
-                <tr className="bg-gray-50 border-b border-gray-200">
-                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Nama Kategori</th>
-                  <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase">Jumlah Koleksi</th>
-                  {hasRole('admin', 'staff') && (
-                    <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">Aksi</th>
-                  )}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {categories.map((cat) => (
-                  <tr key={cat.id} className="hover:bg-gray-50 transition">
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">{cat.name}</td>
-                    <td className="px-6 py-4 text-sm text-center text-gray-500">{cat.collections_count || 0}</td>
-                    {hasRole('admin', 'staff') && (
-                      <td className="px-6 py-4 text-right">
-                        <button
-                          onClick={() => openEditModal(cat)}
-                          className="p-1.5 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition"
-                          title="Edit"
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                          </svg>
-                        </button>
-                        <button
-                          onClick={() => handleDelete(cat.id)}
-                          className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-md transition"
-                          title="Hapus"
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                        </button>
-                      </td>
-                    )}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {categories.map((c) => (
+            <div
+              key={c.id}
+              className="p-5 rounded-2xl bg-white dark:bg-sage-900 border border-sand-200 dark:border-sage-800 shadow-sm hover:shadow-md hover:border-emerald-300 dark:hover:border-emerald-700 transition flex items-center justify-between"
+            >
+              <div className="flex items-center gap-3">
+                <div className="p-3 rounded-xl bg-sand-100 dark:bg-sage-800 text-emerald-600 dark:text-emerald-400 font-bold">
+                  <Tags className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-sm text-slate-900 dark:text-white">
+                    {c.name}
+                  </h3>
+                  <span className="text-[11px] font-mono text-slate-400">
+                    ID: #{c.id} • Koleksi Aktif
+                  </span>
+                </div>
+              </div>
+
+              {hasRole('admin', 'staff') && (
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => openEditModal(c)}
+                    className="p-1.5 rounded-lg border border-sand-200 dark:border-sage-700 hover:bg-sand-100 dark:hover:bg-sage-800 text-slate-600 dark:text-slate-300 transition"
+                    title="Edit Kategori"
+                  >
+                    <Edit2 className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(c.id)}
+                    className="p-1.5 rounded-lg border border-sand-200 dark:border-sage-700 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-rose-500 transition"
+                    title="Hapus Kategori"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              )}
+            </div>
+          ))}
         </div>
       )}
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-900">
-                {editing ? 'Edit Kategori' : 'Tambah Kategori'}
-              </h2>
-            </div>
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+          <div className="bg-white dark:bg-sage-900 rounded-2xl shadow-2xl border border-sand-200 dark:border-sage-800 w-full max-w-sm p-6">
+            <h2 className="text-base font-bold text-slate-900 dark:text-white mb-4">
+              {editing ? 'Edit Kategori' : 'Tambah Kategori Baru'}
+            </h2>
+
+            <form onSubmit={handleSubmit} className="space-y-4 text-xs">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Nama Kategori *</label>
+                <label className="block font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
+                  Nama Kategori *
+                </label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
-                  placeholder="Nama kategori"
+                  placeholder="Contoh: Robotika & AI"
+                  className="w-full px-3 py-2.5 rounded-xl border border-sand-300 dark:border-sage-700 bg-sand-50/50 dark:bg-sage-950 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
                 />
               </div>
-              <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+
+              <div className="pt-3 border-t border-sand-200 dark:border-sage-800 flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition"
+                  className="px-4 py-2 rounded-xl border border-sand-300 dark:border-sage-700 text-slate-600 dark:text-slate-300 hover:bg-sand-100"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 rounded-lg transition"
+                  className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold disabled:opacity-50 transition"
                 >
-                  {submitting ? 'Menyimpan...' : editing ? 'Simpan' : 'Tambah'}
+                  {submitting ? 'Menyimpan...' : 'Simpan Kategori'}
                 </button>
               </div>
             </form>

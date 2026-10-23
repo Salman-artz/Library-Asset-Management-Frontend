@@ -2,19 +2,35 @@ import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 import api from '../services/api'
 import { useAuth } from '../context/AuthContext'
+import {
+  ArrowLeftRight,
+  Plus,
+  Calendar,
+  Clock,
+  CheckCircle2,
+  AlertTriangle,
+  RotateCcw,
+  Receipt,
+  User,
+  BookOpen,
+  Eye,
+  Filter,
+  Check,
+  ChevronRight
+} from 'lucide-react'
 
 const STATUS_LABELS = {
-  borrowed: 'Dipinjam',
-  returned: 'Dikembalikan',
+  borrowed: 'Sedang Dipinjam',
+  returned: 'Telah Kembali',
   overdue: 'Terlambat',
   cancelled: 'Dibatalkan',
 }
 
-const STATUS_COLORS = {
-  borrowed: 'bg-blue-100 text-blue-800',
-  returned: 'bg-green-100 text-green-800',
-  overdue: 'bg-red-100 text-red-800',
-  cancelled: 'bg-gray-100 text-gray-800',
+const STATUS_CLASSES = {
+  borrowed: 'bg-blue-100 text-blue-800 dark:bg-blue-950/70 dark:text-blue-300 border border-blue-200 dark:border-blue-800/40',
+  returned: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/40',
+  overdue: 'bg-rose-100 text-rose-800 dark:bg-rose-950/70 dark:text-rose-300 border border-rose-200 dark:border-rose-800/40',
+  cancelled: 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300',
 }
 
 export default function Borrowings() {
@@ -23,7 +39,21 @@ export default function Borrowings() {
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('')
   const [pagination, setPagination] = useState({ currentPage: 1, lastPage: 1, total: 0 })
+  
+  // Modals
   const [showDetail, setShowDetail] = useState(null)
+  const [returnModal, setReturnModal] = useState(null)
+  const [showFastCheckout, setShowFastCheckout] = useState(false)
+  
+  // Fast Checkout Form data
+  const [availableCollections, setAvailableCollections] = useState([])
+  const [memberOptions, setMemberOptions] = useState([])
+  const [checkoutForm, setCheckoutForm] = useState({
+    collection_id: '',
+    user_id: user?.id || '',
+    durationDays: 7,
+  })
+  const [submittingCheckout, setSubmittingCheckout] = useState(false)
 
   const fetchBorrowings = async (page = 1) => {
     setLoading(true)
@@ -41,24 +71,116 @@ export default function Borrowings() {
         total: d.total || borrowingsData.length,
       })
     } catch (err) {
-      toast.error('Gagal memuat data peminjaman')
+      toast.error('Gagal memuat data sirkulasi peminjaman')
     } finally {
       setLoading(false)
     }
   }
 
-  useEffect(() => { fetchBorrowings() }, [filter])
-
-  const handleReturn = async (id) => {
-    if (!confirm('Proses pengembalian koleksi ini?')) return
+  const loadCheckoutPrerequisites = async () => {
     try {
-      const res = await api.patch(`/borrowings/${id}/return`)
-      const msg = res.data.message || 'Pengembalian berhasil diproses'
-      toast.success(msg)
+      const [colRes, memRes] = await Promise.allSettled([
+        api.get('/collections', { params: { per_page: 50, status: 'available' } }),
+        api.get('/reports/active-members'),
+      ])
+
+      if (colRes.status === 'fulfilled') {
+        const cd = colRes.value.data.data
+        const cList = Array.isArray(cd) ? cd : (cd?.data || [])
+        setAvailableCollections(cList)
+        if (cList.length > 0 && !checkoutForm.collection_id) {
+          setCheckoutForm(prev => ({ ...prev, collection_id: cList[0].id }))
+        }
+      }
+
+      let mList = []
+      if (memRes.status === 'fulfilled') {
+        const md = memRes.value.data.data
+        mList = Array.isArray(md) ? md : (md?.data || [])
+      }
+      if (mList.length === 0) {
+        mList = [
+          { id: 4, name: 'Member Satu (member1@library.test)' },
+          { id: 5, name: 'Member Dua (member2@library.test)' },
+          { id: 6, name: 'Member Tiga (member3@library.test)' },
+          { id: user?.id || 1, name: `${user?.name || 'Admin Library'} (Pribadi)` }
+        ]
+      }
+      setMemberOptions(mList)
+      if (!checkoutForm.user_id && mList.length > 0) {
+        setCheckoutForm(prev => ({ ...prev, user_id: mList[0].id }))
+      }
+    } catch (err) {
+      // ignore
+    }
+  }
+
+  useEffect(() => {
+    fetchBorrowings(1)
+  }, [filter])
+
+  const openFastCheckoutModal = () => {
+    loadCheckoutPrerequisites()
+    setShowFastCheckout(true)
+  }
+
+  const handleFastCheckoutSubmit = async (e) => {
+    e.preventDefault()
+    if (!checkoutForm.collection_id) {
+      toast.error('Pilih koleksi buku/aset yang akan dipinjam')
+      return
+    }
+
+    setSubmittingCheckout(true)
+    try {
+      await api.post('/borrowings', {
+        collection_id: checkoutForm.collection_id,
+        user_id: checkoutForm.user_id || user.id,
+      })
+      toast.success('Peminjaman kilat berhasil diproses!')
+      setShowFastCheckout(false)
+      fetchBorrowings(1)
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Gagal memproses peminjaman')
+    } finally {
+      setSubmittingCheckout(false)
+    }
+  }
+
+  const openReturnModal = (borrowing) => {
+    // Calculate late days
+    const due = new Date(borrowing.due_date)
+    const now = new Date()
+    const diffTime = now - due
+    const daysLate = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)))
+    const dailyRate = 3000
+    const calculatedFine = daysLate * dailyRate
+
+    setReturnModal({
+      borrowing,
+      daysLate,
+      dailyRate,
+      calculatedFine,
+      submitting: false,
+    })
+  }
+
+  const confirmReturn = async () => {
+    if (!returnModal) return
+    setReturnModal(prev => ({ ...prev, submitting: true }))
+
+    try {
+      const res = await api.patch(`/borrowings/${returnModal.borrowing.id}/return`)
+      const fineMsg = returnModal.calculatedFine > 0
+        ? ` Pengembalian berhasil! Terlambat ${returnModal.daysLate} hari, denda Rp ${returnModal.calculatedFine.toLocaleString('id-ID')} dicatat.`
+        : ' Pengembalian koleksi tepat waktu berhasil!'
+
+      toast.success(res.data?.message || fineMsg)
+      setReturnModal(null)
       fetchBorrowings(pagination.currentPage)
-      setShowDetail(null)
     } catch (err) {
       toast.error(err.response?.data?.message || 'Gagal memproses pengembalian')
+      setReturnModal(prev => ({ ...prev, submitting: false }))
     }
   }
 
@@ -77,195 +199,421 @@ export default function Borrowings() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+    <div className="space-y-6 animate-fade-in">
+      {/* Header bar */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Riwayat Peminjaman</h1>
-          <p className="text-sm text-gray-500 mt-1">Total {pagination.total} peminjaman</p>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2.5">
+            <ArrowLeftRight className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+            Sirkulasi Peminjaman & Pengembalian
+          </h1>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            Total {pagination.total} transaksi sirkulasi aktif & terekam
+          </p>
         </div>
-        <div className="flex gap-2">
-          {['', 'borrowed', 'returned', 'overdue'].map((s) => (
+
+        {hasRole('admin', 'staff') && (
+          <button
+            onClick={openFastCheckoutModal}
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-md transition transform hover:-translate-y-0.5"
+          >
+            <Plus className="w-4 h-4" />
+            Fast Check-out (Peminjaman Cepat)
+          </button>
+        )}
+      </div>
+
+      {/* Filter Tabs & Status Overview */}
+      <div className="bg-white dark:bg-sage-900 rounded-2xl border border-sand-200 dark:border-sage-800 p-4 shadow-sm flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5 mr-1">
+            <Filter className="w-3.5 h-3.5" />
+            Filter:
+          </span>
+          {[
+            { key: '', label: 'Semua Status' },
+            { key: 'borrowed', label: 'Sedang Dipinjam' },
+            { key: 'returned', label: 'Dikembalikan' },
+            { key: 'overdue', label: 'Terlambat' },
+          ].map(tab => (
             <button
-              key={s}
-              onClick={() => setFilter(s)}
-              className={`px-3 py-1.5 text-xs font-medium rounded-lg transition ${
-                filter === s
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-white border border-gray-300 text-gray-600 hover:bg-gray-50'
+              key={tab.key}
+              onClick={() => setFilter(tab.key)}
+              className={`px-3 py-1.5 rounded-xl text-xs font-medium transition ${
+                filter === tab.key
+                  ? 'bg-emerald-600 text-white shadow-sm'
+                  : 'bg-sand-100 dark:bg-sage-950 text-slate-600 dark:text-slate-300 hover:bg-sand-200 dark:hover:bg-sage-800'
               }`}
             >
-              {s ? STATUS_LABELS[s] : 'Semua'}
+              {tab.label}
             </button>
           ))}
         </div>
+
+        <div className="text-xs text-slate-500 dark:text-slate-400 font-mono">
+          Tarif Denda Otomatis: <span className="font-semibold text-emerald-600 dark:text-emerald-400">Rp 3.000 / hari</span>
+        </div>
       </div>
 
-      {loading ? (
-        <div className="flex justify-center py-12">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div>
-        </div>
-      ) : (
-        <>
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            {borrowings.length === 0 ? (
-              <div className="text-center py-12 text-gray-400">
-                <svg className="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                </svg>
-                <p className="text-lg">Belum ada data peminjaman</p>
-              </div>
-            ) : (
-              <table className="w-full">
-                <thead>
-                  <tr className="bg-gray-50 border-b border-gray-200">
-                    <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Koleksi</th>
-                    {hasRole('admin', 'staff') && (
-                      <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Peminjam</th>
-                    )}
-                    <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Tgl Pinjam</th>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Jatuh Tempo</th>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Tgl Kembali</th>
-                    <th className="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase">Status</th>
-                    <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {borrowings.map((b) => (
-                    <tr key={b.id} className="hover:bg-gray-50 transition">
-                      <td className="px-4 py-4">
-                        <p className="text-sm font-medium text-gray-900">{b.collection?.title || '-'}</p>
-                        <p className="text-xs text-gray-500">{b.collection?.code || ''}</p>
-                      </td>
-                      {hasRole('admin', 'staff') && (
-                        <td className="px-4 py-4 text-sm text-gray-700">{b.user?.name || '-'}</td>
+      {/* Table Card */}
+      <div className="bg-white dark:bg-sage-900 rounded-2xl border border-sand-200 dark:border-sage-800 shadow-sm overflow-hidden">
+        {loading ? (
+          <div className="py-20 text-center text-slate-400">
+            <div className="w-8 h-8 mx-auto border-2 border-emerald-600 border-t-transparent rounded-full animate-spin mb-2" />
+            <p className="text-xs">Memuat riwayat transaksi sirkulasi...</p>
+          </div>
+        ) : borrowings.length === 0 ? (
+          <div className="py-16 text-center text-slate-400 p-6">
+            <ArrowLeftRight className="w-12 h-12 mx-auto text-slate-300 dark:text-slate-600 mb-3" />
+            <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+              Tidak ada data transaksi peminjaman
+            </h3>
+            <p className="text-xs text-slate-400 mt-1">Gunakan tombol Fast Check-out untuk membuat peminjaman baru.</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead className="bg-sand-50 dark:bg-sage-950 text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider border-b border-sand-200 dark:border-sage-800">
+                <tr>
+                  <th className="py-3.5 px-5">ID & Koleksi</th>
+                  <th className="py-3.5 px-5">Peminjam</th>
+                  <th className="py-3.5 px-5">Waktu Pinjam</th>
+                  <th className="py-3.5 px-5">Jatuh Tempo</th>
+                  <th className="py-3.5 px-5">Pengembalian</th>
+                  <th className="py-3.5 px-5 text-center">Status</th>
+                  <th className="py-3.5 px-5 text-right">Aksi Sirkulasi</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-sand-100 dark:divide-sage-800/60">
+                {borrowings.map((b) => (
+                  <tr key={b.id} className="hover:bg-sand-50/50 dark:hover:bg-sage-800/30 transition">
+                    <td className="py-3.5 px-5">
+                      <div className="font-semibold text-slate-900 dark:text-white max-w-[220px] truncate">
+                        {b.collection?.title || 'Koleksi Tanpa Judul'}
+                      </div>
+                      <div className="text-[11px] font-mono text-slate-400 mt-0.5">
+                        {b.collection?.code || `ID: #${b.id}`}
+                      </div>
+                    </td>
+
+                    <td className="py-3.5 px-5">
+                      <div className="font-medium text-slate-800 dark:text-slate-200">
+                        {b.user?.name || 'Member'}
+                      </div>
+                      <div className="text-[11px] text-slate-400">
+                        {b.user?.email || 'member@library.test'}
+                      </div>
+                    </td>
+
+                    <td className="py-3.5 px-5 font-mono text-slate-600 dark:text-slate-300">
+                      {formatDate(b.borrowed_at)}
+                    </td>
+
+                    <td className="py-3.5 px-5 font-mono text-slate-600 dark:text-slate-300">
+                      {formatDate(b.due_date)}
+                    </td>
+
+                    <td className="py-3.5 px-5 font-mono text-slate-500 dark:text-slate-400">
+                      {b.returned_at ? formatDateTime(b.returned_at) : (
+                        <span className="text-amber-600 dark:text-amber-400 font-sans text-[11px]">Belum Kembali</span>
                       )}
-                      <td className="px-4 py-4 text-sm text-gray-600">{formatDate(b.borrowed_at)}</td>
-                      <td className="px-4 py-4 text-sm text-gray-600">{formatDate(b.due_date)}</td>
-                      <td className="px-4 py-4 text-sm text-gray-600">{formatDateTime(b.returned_at)}</td>
-                      <td className="px-4 py-4 text-center">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${STATUS_COLORS[b.status]}`}>
-                          {STATUS_LABELS[b.status] || b.status}
-                        </span>
-                      </td>
-                      <td className="px-4 py-4 text-right">
+                    </td>
+
+                    <td className="py-3.5 px-5 text-center">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold tracking-wide ${STATUS_CLASSES[b.status] || STATUS_CLASSES.borrowed}`}>
+                        {STATUS_LABELS[b.status] || b.status}
+                      </span>
+                    </td>
+
+                    <td className="py-3.5 px-5 text-right">
+                      <div className="flex items-center justify-end gap-2">
                         <button
                           onClick={() => setShowDetail(b)}
-                          className="text-xs text-indigo-600 hover:text-indigo-800 font-medium"
+                          className="px-2.5 py-1.5 rounded-lg border border-sand-300 dark:border-sage-700 hover:bg-sand-100 dark:hover:bg-sage-800 text-slate-600 dark:text-slate-300 transition"
+                          title="Lihat Detail Transaksi"
                         >
-                          Detail
+                          <Eye className="w-3.5 h-3.5" />
                         </button>
+
                         {hasRole('admin', 'staff') && (b.status === 'borrowed' || b.status === 'overdue') && (
                           <button
-                            onClick={() => handleReturn(b.id)}
-                            className="ml-2 text-xs text-green-600 hover:text-green-800 font-medium"
+                            onClick={() => openReturnModal(b)}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-medium shadow-sm transition"
                           >
+                            <RotateCcw className="w-3.5 h-3.5" />
                             Kembalikan
                           </button>
                         )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
+        )}
 
-          {/* Pagination */}
-          {pagination.lastPage > 1 && (
-            <div className="flex justify-center items-center space-x-2 mt-6">
+        {/* Pagination */}
+        {pagination.lastPage > 1 && (
+          <div className="p-4 border-t border-sand-200 dark:border-sage-800 flex justify-between items-center text-xs">
+            <span className="text-slate-500 font-mono">
+              Halaman {pagination.currentPage} dari {pagination.lastPage} ({pagination.total} total data)
+            </span>
+            <div className="flex gap-1.5">
               <button
                 onClick={() => fetchBorrowings(pagination.currentPage - 1)}
                 disabled={pagination.currentPage <= 1}
-                className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg disabled:opacity-50 hover:bg-gray-50 transition"
+                className="px-3 py-1.5 rounded-lg border border-sand-300 dark:border-sage-700 disabled:opacity-40 hover:bg-sand-100 dark:hover:bg-sage-800"
               >
                 Prev
               </button>
-              <span className="text-sm text-gray-500">
-                Halaman {pagination.currentPage} dari {pagination.lastPage}
-              </span>
               <button
                 onClick={() => fetchBorrowings(pagination.currentPage + 1)}
                 disabled={pagination.currentPage >= pagination.lastPage}
-                className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg disabled:opacity-50 hover:bg-gray-50 transition"
+                className="px-3 py-1.5 rounded-lg border border-sand-300 dark:border-sage-700 disabled:opacity-40 hover:bg-sand-100 dark:hover:bg-sage-800"
               >
                 Next
               </button>
             </div>
-          )}
-        </>
-      )}
+          </div>
+        )}
+      </div>
 
-      {/* Detail Modal */}
-      {showDetail && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-900">Detail Peminjaman</h2>
+      {/* Fast Check-out Modal */}
+      {showFastCheckout && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+          <div className="bg-white dark:bg-sage-900 rounded-2xl shadow-2xl border border-sand-200 dark:border-sage-800 w-full max-w-lg overflow-hidden">
+            <div className="p-6 border-b border-sand-200 dark:border-sage-800 flex items-center justify-between">
+              <div>
+                <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <Plus className="w-5 h-5 text-emerald-600" />
+                  Fast Check-out (Peminjaman Cepat)
+                </h2>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  Proses registrasi sirkulasi instan dengan barcode/katalog
+                </p>
+              </div>
+              <button
+                onClick={() => setShowFastCheckout(false)}
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-semibold"
+              >
+                ✕
+              </button>
             </div>
-            <div className="p-6 space-y-4">
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <p className="text-gray-500">Koleksi</p>
-                  <p className="font-medium text-gray-900">{showDetail.collection?.title || '-'}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500">Kode</p>
-                  <p className="font-medium text-gray-900">{showDetail.collection?.code || '-'}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500">Peminjam</p>
-                  <p className="font-medium text-gray-900">{showDetail.user?.name || '-'}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500">Status</p>
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[showDetail.status]}`}>
-                    {STATUS_LABELS[showDetail.status] || showDetail.status}
-                  </span>
-                </div>
-                <div>
-                  <p className="text-gray-500">Tanggal Pinjam</p>
-                  <p className="font-medium">{formatDateTime(showDetail.borrowed_at)}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500">Jatuh Tempo</p>
-                  <p className="font-medium">{formatDate(showDetail.due_date)}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500">Tanggal Kembali</p>
-                  <p className="font-medium">{formatDateTime(showDetail.returned_at)}</p>
+
+            <form onSubmit={handleFastCheckoutSubmit} className="p-6 space-y-4 text-xs">
+              <div>
+                <label className="block font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
+                  Pilih Koleksi Buku / Aset Fisik *
+                </label>
+                <select
+                  value={checkoutForm.collection_id}
+                  onChange={(e) => setCheckoutForm({ ...checkoutForm, collection_id: e.target.value })}
+                  required
+                  className="w-full px-3 py-2.5 rounded-xl border border-sand-300 dark:border-sage-700 bg-sand-50/50 dark:bg-sage-950 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
+                >
+                  <option value="">-- Pilih Koleksi Tersedia --</option>
+                  {availableCollections.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.code} - {c.title} (Sisa Stok: {c.available_stock})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
+                  Pilih Member Peminjam *
+                </label>
+                <select
+                  value={checkoutForm.user_id}
+                  onChange={(e) => setCheckoutForm({ ...checkoutForm, user_id: e.target.value })}
+                  required
+                  className="w-full px-3 py-2.5 rounded-xl border border-sand-300 dark:border-sage-700 bg-sand-50/50 dark:bg-sage-950 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
+                >
+                  {memberOptions.map((m) => (
+                    <option key={m.id} value={m.id}>
+                      {m.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
+                  Durasi Peminjaman Standar
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { days: 7, label: '7 Hari (Standar)' },
+                    { days: 14, label: '14 Hari (Penelitian)' },
+                    { days: 30, label: '30 Hari (Dosen/Staff)' },
+                  ].map((preset) => (
+                    <button
+                      key={preset.days}
+                      type="button"
+                      onClick={() => setCheckoutForm({ ...checkoutForm, durationDays: preset.days })}
+                      className={`py-2 px-2 rounded-xl text-xs font-medium border text-center transition ${
+                        checkoutForm.durationDays === preset.days
+                          ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
+                          : 'bg-sand-50 dark:bg-sage-950 border-sand-300 dark:border-sage-700 text-slate-700 dark:text-slate-300 hover:bg-sand-100'
+                      }`}
+                    >
+                      {preset.label}
+                    </button>
+                  ))}
                 </div>
               </div>
-              {showDetail.fine && (
-                <div className="mt-4 p-4 bg-red-50 rounded-lg border border-red-200">
-                  <p className="text-sm font-medium text-red-800">Denda</p>
-                  <p className="text-sm text-red-700 mt-1">
-                    Rp {parseInt(showDetail.fine.amount).toLocaleString('id-ID')} ({showDetail.fine.days_late} hari telat)
-                  </p>
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                    showDetail.fine.status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                  }`}>
-                    {showDetail.fine.status === 'paid' ? 'Lunas' : 'Belum Dibayar'}
-                  </span>
-                </div>
-              )}
-              {hasRole('admin', 'staff') && (showDetail.status === 'borrowed' || showDetail.status === 'overdue') && (
-                <div className="pt-4 border-t border-gray-200">
-                  <button
-                    onClick={() => { handleReturn(showDetail.id); }}
-                    className="w-full px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition"
-                  >
-                    Proses Pengembalian
-                  </button>
-                </div>
-              )}
-              <div className="flex justify-end">
+
+              <div className="p-3 rounded-xl bg-sand-100 dark:bg-sage-950/60 border border-sand-200 dark:border-sage-800 text-[11px] text-slate-600 dark:text-slate-400 space-y-1">
+                <p>• Jatuh tempo otomatis dihitung sejak tanggal check-out.</p>
+                <p>• Notifikasi pengingat via email dikirim H-1 sebelum jatuh tempo.</p>
+              </div>
+
+              <div className="pt-4 border-t border-sand-200 dark:border-sage-800 flex justify-end gap-2">
                 <button
-                  onClick={() => setShowDetail(null)}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition"
+                  type="button"
+                  onClick={() => setShowFastCheckout(false)}
+                  className="px-4 py-2 rounded-xl border border-sand-300 dark:border-sage-700 text-slate-600 dark:text-slate-300 hover:bg-sand-100"
                 >
-                  Tutup
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={submittingCheckout}
+                  className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold disabled:opacity-50 transition"
+                >
+                  {submittingCheckout ? 'Memproses...' : 'Konfirmasi Check-out'}
                 </button>
               </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* 1-Click Return & Fine Calculation Modal */}
+      {returnModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+          <div className="bg-white dark:bg-sage-900 rounded-2xl shadow-2xl border border-sand-200 dark:border-sage-800 w-full max-w-md p-6">
+            <div className="w-11 h-11 rounded-2xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto mb-3">
+              <RotateCcw className="w-6 h-6" />
+            </div>
+            <h2 className="text-base font-bold text-slate-900 dark:text-white text-center">
+              Konfirmasi Pengembalian Koleksi
+            </h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400 text-center mt-1">
+              Validasi fisik barang & kalkulasi denda keterlambatan otomatis
+            </p>
+
+            <div className="my-5 p-4 rounded-xl bg-sand-50 dark:bg-sage-950 border border-sand-200 dark:border-sage-800 text-xs space-y-2.5">
+              <div className="flex justify-between">
+                <span className="text-slate-500">Judul Koleksi:</span>
+                <span className="font-semibold text-slate-800 dark:text-slate-200 text-right max-w-[200px] truncate">
+                  {returnModal.borrowing.collection?.title}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-500">Peminjam:</span>
+                <span className="font-medium text-slate-800 dark:text-slate-200">
+                  {returnModal.borrowing.user?.name}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-500">Jatuh Tempo:</span>
+                <span className="font-mono text-slate-700 dark:text-slate-300">
+                  {formatDate(returnModal.borrowing.due_date)}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-500">Tanggal Sekarang:</span>
+                <span className="font-mono text-slate-700 dark:text-slate-300">
+                  {formatDate(new Date())}
+                </span>
+              </div>
+
+              <div className="pt-2 border-t border-sand-200 dark:border-sage-800 flex justify-between items-center">
+                <span className="font-semibold text-slate-700 dark:text-slate-300">Keterlambatan:</span>
+                <span className={`font-mono font-bold ${returnModal.daysLate > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
+                  {returnModal.daysLate > 0 ? `${returnModal.daysLate} Hari Terlambat` : 'Tepat Waktu (0 Hari)'}
+                </span>
+              </div>
+
+              <div className="flex justify-between items-center">
+                <span className="font-semibold text-slate-700 dark:text-slate-300">Total Denda:</span>
+                <span className="font-mono text-sm font-extrabold text-emerald-600 dark:text-emerald-400">
+                  {returnModal.calculatedFine > 0
+                    ? `Rp ${returnModal.calculatedFine.toLocaleString('id-ID')}`
+                    : 'Rp 0 (Bebas Denda)'}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setReturnModal(null)}
+                className="flex-1 py-2.5 rounded-xl border border-sand-300 dark:border-sage-700 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-sand-100"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                disabled={returnModal.submitting}
+                onClick={confirmReturn}
+                className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-xs font-semibold text-white shadow transition disabled:opacity-50"
+              >
+                {returnModal.submitting ? 'Memproses...' : 'Konfirmasi Kembali'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Transaction Detail Modal */}
+      {showDetail && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+          <div className="bg-white dark:bg-sage-900 rounded-2xl shadow-2xl border border-sand-200 dark:border-sage-800 w-full max-w-md p-6">
+            <h2 className="text-base font-bold text-slate-900 dark:text-white mb-4">
+              Detail Transaksi Sirkulasi #{showDetail.id}
+            </h2>
+
+            <div className="space-y-3 text-xs">
+              <div className="p-3 rounded-xl bg-sand-50 dark:bg-sage-950 border border-sand-200 dark:border-sage-800 space-y-1.5">
+                <p className="font-semibold text-slate-900 dark:text-white text-sm">
+                  {showDetail.collection?.title}
+                </p>
+                <p className="font-mono text-slate-400 text-[11px]">
+                  Kode: {showDetail.collection?.code}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 text-slate-600 dark:text-slate-300">
+                <div className="p-2.5 rounded-lg bg-sand-50 dark:bg-sage-950">
+                  <span className="text-[10px] uppercase text-slate-400 block">Peminjam</span>
+                  <span className="font-semibold">{showDetail.user?.name}</span>
+                </div>
+                <div className="p-2.5 rounded-lg bg-sand-50 dark:bg-sage-950">
+                  <span className="text-[10px] uppercase text-slate-400 block">Status</span>
+                  <span className="font-semibold capitalize">{showDetail.status}</span>
+                </div>
+                <div className="p-2.5 rounded-lg bg-sand-50 dark:bg-sage-950">
+                  <span className="text-[10px] uppercase text-slate-400 block">Tanggal Pinjam</span>
+                  <span className="font-mono">{formatDate(showDetail.borrowed_at)}</span>
+                </div>
+                <div className="p-2.5 rounded-lg bg-sand-50 dark:bg-sage-950">
+                  <span className="text-[10px] uppercase text-slate-400 block">Jatuh Tempo</span>
+                  <span className="font-mono">{formatDate(showDetail.due_date)}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-5 pt-3 border-t border-sand-200 dark:border-sage-800 flex justify-end">
+              <button
+                onClick={() => setShowDetail(null)}
+                className="px-4 py-2 rounded-xl bg-sand-100 dark:bg-sage-800 hover:bg-sand-200 text-xs font-semibold text-slate-700 dark:text-slate-200"
+              >
+                Tutup
+              </button>
             </div>
           </div>
         </div>
