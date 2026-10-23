@@ -185,10 +185,20 @@ export default function SidebarLayout({ children }) {
               <div className={`flex items-center ${collapsed ? 'flex-col space-y-2' : 'justify-between'} pt-1`}>
                 <button
                   onClick={toggleTheme}
-                  className="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-slate-200 hover:text-amber-300 transition"
-                  title={isDark ? 'Mode Terang' : 'Mode Gelap'}
+                  className="flex items-center gap-1.5 p-2 rounded-lg bg-white/10 hover:bg-white/20 text-slate-200 hover:text-amber-300 transition text-xs font-semibold"
+                  title={isDark ? 'Ganti ke Mode Terang' : 'Ganti ke Mode Gelap'}
                 >
-                  {isDark ? <Sun className="w-4 h-4 text-amber-300" /> : <Moon className="w-4 h-4 text-slate-200" />}
+                  {isDark ? (
+                    <>
+                      <Sun className="w-4 h-4 text-amber-300 shrink-0" />
+                      {!collapsed && <span className="text-[11px] text-amber-300">Terang</span>}
+                    </>
+                  ) : (
+                    <>
+                      <Moon className="w-4 h-4 text-slate-200 shrink-0" />
+                      {!collapsed && <span className="text-[11px] text-slate-200">Gelap</span>}
+                    </>
+                  )}
                 </button>
 
                 <button
@@ -241,10 +251,20 @@ export default function SidebarLayout({ children }) {
 
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-amber-300 border border-slate-300 dark:border-slate-700 transition"
-              title="Ganti Tema (Terang/Gelap)"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-amber-300 border border-slate-300 dark:border-slate-700 transition shadow-sm text-xs font-semibold"
+              title={isDark ? 'Ganti ke Mode Terang' : 'Ganti ke Mode Gelap'}
             >
-              {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              {isDark ? (
+                <>
+                  <Sun className="w-3.5 h-3.5 text-amber-400" />
+                  <span className="text-amber-300 text-xs font-bold">Terang</span>
+                </>
+              ) : (
+                <>
+                  <Moon className="w-3.5 h-3.5 text-slate-600" />
+                  <span className="text-slate-700 text-xs font-bold">Gelap</span>
+                </>
+              )}
             </button>
 
             {user && (
